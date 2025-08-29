@@ -1,0 +1,43 @@
+{
+  "name": "agenticv-frontend",
+  "version": "1.0.0",
+  "description": "AgentiCV - AI-Powered CV Upload and Analysis Platform",
+  "private": true,
+  "type": "module",
+  "homepage": "https://sergeypodolskiy.github.io/agenticv-frontend",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.1",
+    "@supabase/supabase-js": "^2.38.0",
+    "react-dropzone": "^14.2.3",
+    "react-hot-toast": "^2.4.1",
+    "axios": "^1.4.0",
+    "lucide-react": "^0.263.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "vite": "^4.4.5",
+    "gh-pages": "^6.0.0"
+  },
+  "keywords": [
+    "cv-analysis",
+    "ai",
+    "supabase",
+    "react",
+    "vite",
+    "terminal-ui"
+  ],
+  "author": "AgentiCV Team",
+  "license": "MIT"
+}
