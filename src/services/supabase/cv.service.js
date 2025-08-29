@@ -97,10 +97,12 @@ export const uploadCV = async (file) => {
       .from(STORAGE_CONFIG.bucketName)
       .getPublicUrl(filePath)
 
-    return {
+    // Prepare result
+    const uploadResult = {
       success: true,
       path: data.path,
       url: urlData.publicUrl,
+      filename: fileName,
       message: 'File uploaded successfully',
       metadata: {
         size: file.size,
@@ -109,6 +111,37 @@ export const uploadCV = async (file) => {
         bucket: STORAGE_CONFIG.bucketName
       }
     }
+
+    // Trigger Flowise webhook if configured
+    if (import.meta.env.VITE_FLOWISE_WEBHOOK_URL) {
+      try {
+        const flowiseResponse = await fetch(import.meta.env.VITE_FLOWISE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            filename: fileName,
+            filepath: filePath,
+            publicUrl: urlData.publicUrl,
+            bucket: STORAGE_CONFIG.bucketName,
+            fileType: file.type,
+            fileSize: file.size,
+            uploadedAt: new Date().toISOString()
+          })
+        })
+        
+        if (flowiseResponse.ok) {
+          uploadResult.flowiseTriggered = true
+          console.log('✅ Flowise webhook triggered successfully')
+        }
+      } catch (error) {
+        console.warn('⚠️ Flowise webhook failed:', error.message)
+        // Don't fail the upload if Flowise is unavailable
+      }
+    }
+
+    return uploadResult
 
   } catch (error) {
     console.error('CV upload error:', error)
