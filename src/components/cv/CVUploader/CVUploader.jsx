@@ -1,242 +1,273 @@
-import React, { useState, useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { toast } from 'react-hot-toast';
-import { CVService } from '../../../services/supabase/cv.service.js';
+import React, { useState, useCallback } from 'react'
+import { useDropzone } from 'react-dropzone'
+import toast from 'react-hot-toast'
+import { uploadCV } from '../../../services/supabase/cv.service'
 
-const CVUploader = ({ onUploadSuccess, onUploadError }) => {
-  const [uploadStatus, setUploadStatus] = useState('idle'); // idle, uploading, success, error
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const [currentTask, setCurrentTask] = useState('');
+const CVUploader = ({ onStatusChange }) => {
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadedFile, setUploadedFile] = useState(null)
 
-  const handleUpload = useCallback(async (acceptedFiles) => {
-    if (acceptedFiles.length === 0) return;
+  // File validation
+  const validateFile = (file) => {
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ]
 
-    const file = acceptedFiles[0];
-    
-    try {
-      setUploadStatus('uploading');
-      setCurrentTask('Validating file...');
-      setProgress(25);
-
-      // Simulate progress for better UX
-      setTimeout(() => {
-        setCurrentTask('Uploading to secure storage...');
-        setProgress(50);
-      }, 500);
-
-      const result = await CVService.uploadCV(file);
-
-      if (result.success) {
-        setProgress(100);
-        setCurrentTask('Upload complete!');
-        setUploadedFile({
-          ...result.data,
-          originalFile: file
-        });
-        setUploadStatus('success');
-        
-        toast.success(`CV uploaded successfully: ${file.name}`);
-        
-        // Call success callback if provided
-        if (onUploadSuccess) {
-          onUploadSuccess(result.data);
-        }
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      console.error('Upload failed:', error);
-      setUploadStatus('error');
-      setCurrentTask('Upload failed');
-      
-      toast.error(error.message || 'Failed to upload CV');
-      
-      // Call error callback if provided
-      if (onUploadError) {
-        onUploadError(error);
-      }
-    } finally {
-      setTimeout(() => {
-        setProgress(0);
-        setCurrentTask('');
-      }, 2000);
+    if (file.size > maxSize) {
+      throw new Error(`File too large. Maximum size is 10MB, got ${(file.size / 1024 / 1024).toFixed(2)}MB`)
     }
-  }, [onUploadSuccess, onUploadError]);
+
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error(`Invalid file type. Supported formats: PDF, DOC, DOCX`)
+    }
+
+    return true
+  }
+
+  // Handle file upload
+  const handleUpload = async (file) => {
+    try {
+      setUploading(true)
+      setUploadProgress(0)
+      
+      // Validate file
+      validateFile(file)
+      
+      onStatusChange(`Validating file: ${file.name}`)
+      onStatusChange(`File size: ${(file.size / 1024 / 1024).toFixed(2)}MB`)
+      
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          const next = prev + Math.random() * 30
+          return next > 90 ? 90 : next
+        })
+      }, 200)
+
+      // Upload to Supabase
+      const result = await uploadCV(file)
+      
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+      
+      setUploadedFile({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: result.url,
+        path: result.path
+      })
+      
+      onStatusChange(`✓ Upload complete: ${file.name}`)
+      onStatusChange(`File stored at: ${result.path}`)
+      
+      toast.success(`CV uploaded successfully: ${file.name}`)
+      
+    } catch (error) {
+      console.error('Upload error:', error)
+      onStatusChange(`✗ Upload failed: ${error.message}`)
+      toast.error(`Upload failed: ${error.message}`)
+      setUploadProgress(0)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // Dropzone configuration
+  const onDrop = useCallback(async (acceptedFiles, rejectedFiles) => {
+    if (rejectedFiles.length > 0) {
+      rejectedFiles.forEach(({ file, errors }) => {
+        errors.forEach(error => {
+          toast.error(`${file.name}: ${error.message}`)
+        })
+      })
+      return
+    }
+
+    if (acceptedFiles.length > 0) {
+      await handleUpload(acceptedFiles[0])
+    }
+  }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: handleUpload,
+    onDrop,
     accept: {
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
     },
+    maxFiles: 1,
     multiple: false,
-    disabled: uploadStatus === 'uploading'
-  });
-
-  const resetUpload = () => {
-    setUploadStatus('idle');
-    setUploadedFile(null);
-    setProgress(0);
-    setCurrentTask('');
-  };
-
-  const handleDelete = async () => {
-    if (!uploadedFile?.id) return;
-    
-    try {
-      const result = await CVService.deleteCV(uploadedFile.id);
-      if (result.success) {
-        toast.success('CV deleted successfully');
-        resetUpload();
-      } else {
-        toast.error(result.error || 'Failed to delete CV');
-      }
-    } catch (error) {
-      console.error('Delete failed:', error);
-      toast.error('Failed to delete CV');
-    }
-  };
+    disabled: uploading
+  })
 
   return (
-    <div className="terminal-window">
-      <div className="terminal-header">
-        <div className="terminal-title">CV_UPLOAD.INTERFACE</div>
-        <div className="terminal-controls">
-          <div className="terminal-dot red"></div>
-          <div className="terminal-dot yellow"></div>
-          <div className="terminal-dot green"></div>
+    <div style={{ width: '100%' }}>
+      {/* Upload Area */}
+      <div
+        {...getRootProps()}
+        style={{
+          border: `2px dashed ${isDragActive ? 'var(--terminal-green)' : 'var(--terminal-border)'}`,
+          borderRadius: 'var(--radius-md)',
+          padding: 'var(--spacing-2xl)',
+          textAlign: 'center',
+          cursor: uploading ? 'not-allowed' : 'pointer',
+          backgroundColor: isDragActive ? 'rgba(0, 255, 0, 0.05)' : 'var(--terminal-bg-secondary)',
+          transition: 'all 0.3s ease',
+          minHeight: '200px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 'var(--spacing-md)'
+        }}
+      >
+        <input {...getInputProps()} />
+        
+        {/* Upload Icon */}
+        <div style={{
+          fontSize: '3rem',
+          color: isDragActive ? 'var(--terminal-green)' : 'var(--terminal-gray)'
+        }}>
+          📄
         </div>
+        
+        {/* Upload Text */}
+        <div>
+          {uploading ? (
+            <div>
+              <p style={{ color: 'var(--terminal-amber)', marginBottom: 'var(--spacing-sm)' }}>
+                Uploading CV...
+              </p>
+              <div style={{
+                width: '300px',
+                height: '6px',
+                backgroundColor: 'var(--terminal-bg)',
+                borderRadius: '3px',
+                overflow: 'hidden',
+                margin: '0 auto'
+              }}>
+                <div style={{
+                  width: `${uploadProgress}%`,
+                  height: '100%',
+                  backgroundColor: 'var(--terminal-green)',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+              <p style={{ 
+                color: 'var(--terminal-green)', 
+                fontSize: '0.875rem', 
+                marginTop: 'var(--spacing-sm)' 
+              }}>
+                {uploadProgress.toFixed(0)}%
+              </p>
+            </div>
+          ) : isDragActive ? (
+            <p style={{ color: 'var(--terminal-green)' }}>
+              Drop your CV here...
+            </p>
+          ) : (
+            <div>
+              <p style={{ color: 'var(--terminal-green)', marginBottom: 'var(--spacing-xs)' }}>
+                Drag & drop your CV here, or click to browse
+              </p>
+              <p style={{ color: 'var(--terminal-gray)', fontSize: '0.875rem' }}>
+                Supported formats: PDF, DOC, DOCX (max 10MB)
+              </p>
+            </div>
+          )}
+        </div>
+        
+        {/* Browse Button */}
+        {!uploading && !isDragActive && (
+          <button 
+            className="btn btn-secondary"
+            style={{ marginTop: 'var(--spacing-md)' }}
+          >
+            Browse Files
+          </button>
+        )}
       </div>
-      
-      <div className="terminal-content">
-        {/* Upload Zone */}
-        <div
-          {...getRootProps()}
-          className={`dropzone ${isDragActive ? 'active' : ''} ${uploadStatus === 'uploading' ? 'disabled' : ''}`}
-        >
-          <input {...getInputProps()} />
+
+      {/* Uploaded File Info */}
+      {uploadedFile && (
+        <div style={{
+          marginTop: 'var(--spacing-lg)',
+          padding: 'var(--spacing-lg)',
+          backgroundColor: 'var(--terminal-bg-secondary)',
+          border: '1px solid var(--terminal-green)',
+          borderRadius: 'var(--radius-md)'
+        }}>
+          <h3 style={{
+            color: 'var(--terminal-green)',
+            marginBottom: 'var(--spacing-md)',
+            fontSize: '1rem'
+          }}>
+            ✓ Uploaded Successfully
+          </h3>
           
-          <div>
-            {uploadStatus === 'success' && uploadedFile ? (
-              // Success State
-              <div className="text-center">
-                <div className="text-success mb-3" style={{ fontSize: '16px' }}>
-                  ✓ [CV_UPLOADED] {uploadedFile.fileName}
-                </div>
-                
-                <div className="file-info file-info-success mb-3">
-                  <div>File Size: {CVService.formatFileSize(uploadedFile.fileSize)}</div>
-                  <div>Type: {uploadedFile.fileType}</div>
-                  <div>Uploaded: {new Date(uploadedFile.uploadedAt).toLocaleString()}</div>
-                </div>
-                
-                <div className="mb-3">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      resetUpload();
-                    }}
-                    className="btn btn-secondary"
-                    style={{ marginRight: '8px' }}
-                  >
-                    [UPLOAD_NEW]
-                  </button>
-                  
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete();
-                    }}
-                    className="btn btn-danger"
-                  >
-                    [DELETE]
-                  </button>
-                </div>
-                
-                <div style={{ fontSize: '11px', color: '#666666' }}>
-                  CV ready for AI analysis processing
-                </div>
-              </div>
-            ) : uploadStatus === 'uploading' ? (
-              // Uploading State
-              <div className="text-center">
-                <div className="loading mb-3">
-                  <span className="loading-spinner"></span>
-                  {currentTask || 'PROCESSING CV...'}
-                </div>
-                
-                <div className="progress">
-                  <div 
-                    className="progress-bar" 
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-                
-                <div style={{ fontSize: '12px', color: '#666666', marginTop: '8px' }}>
-                  PROGRESS: {progress}%
-                </div>
-                
-                <div style={{ fontSize: '11px', color: '#666666', marginTop: '12px' }}>
-                  • Validating document format and content
-                  <br />
-                  • Uploading to secure cloud storage
-                  <br />
-                  • Preparing for AI analysis pipeline
-                </div>
-              </div>
-            ) : isDragActive ? (
-              // Drag Active State
-              <div className="text-center">
-                <div style={{ color: '#ffffff', fontWeight: '600', marginBottom: '8px', fontSize: '16px' }}>
-                  [DROP_FILE] Release to upload CV
-                </div>
-                <div style={{ fontSize: '11px', color: '#666666' }}>
-                  Processing will begin immediately after drop
-                </div>
-              </div>
-            ) : (
-              // Default State
-              <div className="text-center">
-                <div style={{ marginBottom: '12px', fontSize: '18px' }}>
-                  [CV_UPLOAD] Drop your resume here
-                </div>
-                
-                <div style={{ fontSize: '12px', color: '#666666', marginBottom: '16px' }}>
-                  SUPPORTED FORMATS: PDF, DOC, DOCX
-                  <br />
-                  MAX SIZE: 10MB
-                </div>
-                
-                <button className="btn btn-primary">
-                  [SELECT_FILE] Browse Computer
-                </button>
-                
-                <div style={{ fontSize: '10px', color: '#888888', marginTop: '12px' }}>
-                  Drag and drop your CV file or click to select from your device
-                  <br />
-                  Files are securely stored and processed using AI technology
-                </div>
-              </div>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'auto 1fr', 
+            gap: 'var(--spacing-sm) var(--spacing-md)',
+            fontSize: '0.875rem'
+          }}>
+            <span style={{ color: 'var(--terminal-amber)' }}>File:</span>
+            <span style={{ color: 'var(--terminal-white)' }}>{uploadedFile.name}</span>
+            
+            <span style={{ color: 'var(--terminal-amber)' }}>Size:</span>
+            <span style={{ color: 'var(--terminal-white)' }}>
+              {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+            </span>
+            
+            <span style={{ color: 'var(--terminal-amber)' }}>Type:</span>
+            <span style={{ color: 'var(--terminal-white)' }}>{uploadedFile.type}</span>
+            
+            <span style={{ color: 'var(--terminal-amber)' }}>Path:</span>
+            <span style={{ 
+              color: 'var(--terminal-blue)', 
+              wordBreak: 'break-all',
+              fontFamily: 'var(--font-mono)'
+            }}>
+              {uploadedFile.path}
+            </span>
+          </div>
+          
+          <div style={{ 
+            marginTop: 'var(--spacing-lg)', 
+            display: 'flex', 
+            gap: 'var(--spacing-md)' 
+          }}>
+            <button 
+              className="btn btn-primary"
+              onClick={() => {
+                setUploadedFile(null)
+                setUploadProgress(0)
+                onStatusChange('Ready for new upload')
+              }}
+            >
+              Upload Another
+            </button>
+            
+            {uploadedFile.url && (
+              <a 
+                href={uploadedFile.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+              >
+                View File
+              </a>
             )}
           </div>
         </div>
-        
-        {/* Upload Status Messages */}
-        {uploadStatus === 'error' && (
-          <div className="file-info file-info-error mt-3">
-            <div style={{ fontWeight: '600', marginBottom: '4px' }}>
-              ✗ [UPLOAD_FAILED] File processing error
-            </div>
-            <div style={{ fontSize: '10px' }}>
-              Please check file format and size requirements, then try again
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
-  );
-};
+  )
+}
 
-export default CVUploader;
+export default CVUploader

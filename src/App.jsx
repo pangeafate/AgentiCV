@@ -1,205 +1,176 @@
-import React, { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
-import CVUploader from './components/cv/CVUploader';
+import React, { useState, useEffect } from 'react'
+import CVUploader from './components/cv/CVUploader/CVUploader'
 
 function App() {
-  const [uploadedCVs, setUploadedCVs] = useState([]);
-  const [systemStatus, setSystemStatus] = useState('online');
+  const [currentTime, setCurrentTime] = useState('')
+  const [terminalLines, setTerminalLines] = useState([])
 
-  const handleUploadSuccess = (cvData) => {
-    console.log('CV Upload Success:', cvData);
-    setUploadedCVs(prev => [...prev, cvData]);
-  };
+  useEffect(() => {
+    // Update time every second
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString())
+    }, 1000)
 
-  const handleUploadError = (error) => {
-    console.error('CV Upload Error:', error);
-  };
+    // Initialize terminal with welcome messages
+    const initMessages = [
+      'Welcome to AgenticV Terminal v1.0.0',
+      'Initializing CV processing system...',
+      'System ready. Upload your CV to begin analysis.',
+      ''
+    ]
+    
+    // Add messages with typing effect
+    initMessages.forEach((message, index) => {
+      setTimeout(() => {
+        setTerminalLines(prev => [...prev, message])
+      }, index * 800)
+    })
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const addTerminalLine = (line) => {
+    setTerminalLines(prev => [...prev, line])
+  }
 
   return (
-    <div className="container" style={{ padding: '20px', minHeight: '100vh' }}>
-      {/* System Header */}
-      <div className="terminal-window" style={{ marginBottom: '20px' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--terminal-bg)',
+      padding: 'var(--spacing-lg)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      {/* Main Terminal Window */}
+      <div className="terminal-window" style={{
+        width: '100%',
+        maxWidth: '1200px',
+        minHeight: '700px'
+      }}>
+        {/* Terminal Header */}
         <div className="terminal-header">
-          <div className="terminal-title">AGENTI_CV.SYSTEM_V1.0</div>
           <div className="terminal-controls">
-            <div className="terminal-dot red"></div>
-            <div className="terminal-dot yellow"></div>
-            <div className="terminal-dot green"></div>
+            <button className="terminal-control close" aria-label="Close"></button>
+            <button className="terminal-control minimize" aria-label="Minimize"></button>
+            <button className="terminal-control maximize" aria-label="Maximize"></button>
           </div>
-        </div>
-        <div className="terminal-content">
-          <h1 style={{ marginBottom: '8px' }}>
-            AI-POWERED CV ANALYSIS PLATFORM
-          </h1>
-          <p style={{ color: '#666666', margin: '0', fontSize: '13px' }}>
-            Upload your CV for intelligent analysis and optimization recommendations
-          </p>
-          
-          {/* System Status */}
+          <div className="terminal-title">
+            AgenticV Terminal - CV Upload System
+          </div>
           <div style={{ 
-            display: 'flex', 
-            gap: '20px', 
-            marginTop: '16px', 
-            fontSize: '11px' 
+            marginLeft: 'auto', 
+            color: 'var(--terminal-green)', 
+            fontSize: '0.75rem' 
           }}>
-            <span className="status status-success">
-              <span className="status-dot"></span>
-              SYSTEM_{systemStatus.toUpperCase()}
-            </span>
-            <span className="status status-info">
-              <span className="status-dot"></span>
-              STORAGE_READY
-            </span>
-            <span className="status status-info">
-              <span className="status-dot"></span>
-              AI_ENGINE_STANDBY
-            </span>
+            {currentTime}
           </div>
         </div>
-      </div>
 
-      {/* Main Upload Interface */}
-      <div style={{ marginBottom: '20px' }}>
-        <CVUploader 
-          onUploadSuccess={handleUploadSuccess}
-          onUploadError={handleUploadError}
-        />
-      </div>
-
-      {/* Upload History */}
-      {uploadedCVs.length > 0 && (
-        <div className="panel">
-          <div className="panel-header">
-            <div className="panel-title">
-              <span className="status status-success">
-                <span className="status-dot"></span>
-                UPLOAD_HISTORY
-              </span>
-            </div>
-          </div>
-          <div className="panel-content">
-            <div style={{ fontSize: '12px', marginBottom: '12px', color: '#666666' }}>
-              {uploadedCVs.length} file(s) successfully uploaded
-            </div>
-            
-            {uploadedCVs.map((cv, index) => (
-              <div 
-                key={cv.id || index} 
-                className="file-info file-info-success" 
-                style={{ marginBottom: '8px' }}
-              >
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  marginBottom: '4px'
-                }}>
-                  <span style={{ fontWeight: '600' }}>
-                    {cv.fileName}
-                  </span>
-                  <span className="text-success">
-                    ✓ READY
-                  </span>
-                </div>
-                
-                <div style={{ fontSize: '10px', color: '#888888' }}>
-                  Size: {cv.fileSize ? (cv.fileSize / 1024 / 1024).toFixed(2) : 'Unknown'} MB | 
-                  Uploaded: {cv.uploadedAt ? new Date(cv.uploadedAt).toLocaleTimeString() : 'Unknown'} |
-                  ID: {cv.id?.substring(0, 8)}...
-                </div>
+        {/* Terminal Content */}
+        <div className="terminal-content">
+          {/* Terminal Output */}
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            {terminalLines.map((line, index) => (
+              <div key={index} className="terminal-text" style={{
+                marginBottom: 'var(--spacing-xs)',
+                opacity: line === '' ? 0.5 : 1
+              }}>
+                {line}
               </div>
             ))}
+            <div className="terminal-prompt terminal-text" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-xs)',
+              marginTop: 'var(--spacing-md)'
+            }}>
+              Ready for CV upload
+              <span className="terminal-cursor"></span>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Instructions Panel */}
-      <div className="panel">
-        <div className="panel-header">
-          <div className="panel-title">
-            <span className="status status-info">
-              <span className="status-dot"></span>
-              SYSTEM_INSTRUCTIONS
-            </span>
+          {/* Main Content Area */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr',
+            gap: 'var(--spacing-xl)',
+          }}>
+            {/* Upload Section */}
+            <section>
+              <h2 style={{
+                color: 'var(--terminal-amber)',
+                fontSize: '1.25rem',
+                fontWeight: 'bold',
+                marginBottom: 'var(--spacing-lg)',
+                fontFamily: 'var(--font-mono)'
+              }}>
+                {'>'} Upload CV Document
+              </h2>
+              
+              <CVUploader onStatusChange={addTerminalLine} />
+            </section>
+
+            {/* System Info */}
+            <section style={{
+              borderTop: '1px solid var(--terminal-border)',
+              paddingTop: 'var(--spacing-lg)',
+              marginTop: 'var(--spacing-lg)'
+            }}>
+              <h3 style={{
+                color: 'var(--terminal-blue)',
+                fontSize: '1rem',
+                marginBottom: 'var(--spacing-md)',
+                fontFamily: 'var(--font-mono)'
+              }}>
+                System Information
+              </h3>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: 'var(--spacing-md)',
+                fontSize: '0.875rem',
+                color: 'var(--terminal-gray)'
+              }}>
+                <div>
+                  <span style={{ color: 'var(--terminal-green)' }}>Status:</span> Online
+                </div>
+                <div>
+                  <span style={{ color: 'var(--terminal-green)' }}>Version:</span> 1.0.0
+                </div>
+                <div>
+                  <span style={{ color: 'var(--terminal-green)' }}>Uptime:</span> {currentTime}
+                </div>
+                <div>
+                  <span style={{ color: 'var(--terminal-green)' }}>Storage:</span> Supabase
+                </div>
+              </div>
+            </section>
           </div>
-        </div>
-        <div className="panel-content">
-          <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ color: '#ffffff', fontWeight: '600', marginBottom: '4px' }}>
-                [STEP_1] UPLOAD_CV
-              </div>
-              <div style={{ color: '#666666', fontSize: '11px' }}>
-                Drag and drop your CV file (PDF, DOC, DOCX) or click to browse
-              </div>
-            </div>
-            
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ color: '#ffffff', fontWeight: '600', marginBottom: '4px' }}>
-                [STEP_2] AI_ANALYSIS
-              </div>
-              <div style={{ color: '#666666', fontSize: '11px' }}>
-                Our AI engine will analyze your CV structure, content, and keywords
-              </div>
-            </div>
-            
-            <div>
-              <div style={{ color: '#ffffff', fontWeight: '600', marginBottom: '4px' }}>
-                [STEP_3] OPTIMIZATION
-              </div>
-              <div style={{ color: '#666666', fontSize: '11px' }}>
-                Receive personalized recommendations to improve your CV effectiveness
-              </div>
-            </div>
-          </div>
+
+          {/* Footer */}
+          <footer style={{
+            marginTop: 'var(--spacing-2xl)',
+            paddingTop: 'var(--spacing-lg)',
+            borderTop: '1px solid var(--terminal-border)',
+            textAlign: 'center',
+            color: 'var(--terminal-gray)',
+            fontSize: '0.75rem'
+          }}>
+            <p>
+              AgenticV Terminal | Powered by React + Vite | 
+              <span style={{ color: 'var(--terminal-green)' }}> Ready for deployment</span>
+            </p>
+            <p style={{ marginTop: 'var(--spacing-xs)' }}>
+              Upload supported formats: PDF, DOC, DOCX | Max size: 10MB
+            </p>
+          </footer>
         </div>
       </div>
-
-      {/* Footer */}
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '40px', 
-        padding: '20px 0',
-        borderTop: '1px solid #333333',
-        fontSize: '10px',
-        color: '#666666'
-      }}>
-        <div>
-          AGENTI_CV © 2024 | AI-Powered Career Enhancement Platform
-        </div>
-        <div style={{ marginTop: '4px' }}>
-          Powered by Supabase Storage & Advanced ML Algorithms
-        </div>
-      </div>
-
-      {/* Toast Container */}
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#1a1a1a',
-            color: '#ffffff',
-            border: '1px solid #333333',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '12px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#27ca3f',
-              secondary: '#000000',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#ff5f56',
-              secondary: '#000000',
-            },
-          },
-        }}
-      />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
