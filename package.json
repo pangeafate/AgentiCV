@@ -10,7 +10,13 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:local": "playwright test --config=playwright.config.js --project=local",
+    "test:deployed": "playwright test --config=playwright.config.js --project=deployed",
+    "test:debug": "playwright test --debug"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
@@ -20,6 +26,7 @@
     "react-hot-toast": "^2.4.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",
