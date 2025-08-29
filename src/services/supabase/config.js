@@ -4,9 +4,21 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co'
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key-here'
 
+// Check if we're in mock mode
+export const isMockMode = !import.meta.env.VITE_SUPABASE_URL || 
+                          !import.meta.env.VITE_SUPABASE_ANON_KEY ||
+                          import.meta.env.VITE_SUPABASE_URL === 'https://your-project.supabase.co'
+
 // Validate required environment variables
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn('⚠️ Supabase configuration missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.')
+if (isMockMode) {
+  console.log('🔧 Running in MOCK MODE - No real Supabase connection')
+  console.log('📝 To connect to Supabase:')
+  console.log('   1. Create a project at https://supabase.com')
+  console.log('   2. Get your project URL and anon key from Settings → API')
+  console.log('   3. Update .env.local with your credentials')
+  console.log('   4. Restart the dev server with: npm run dev')
+} else {
+  console.log('✅ Connected to Supabase:', supabaseUrl)
 }
 
 // Create Supabase client
@@ -23,7 +35,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Supabase storage bucket configuration
 export const STORAGE_CONFIG = {
-  bucketName: 'cv-documents',
+  bucketName: 'cv-uploads', // Must match the bucket name in Supabase
   maxFileSize: 10 * 1024 * 1024, // 10MB
   allowedMimeTypes: [
     'application/pdf',
