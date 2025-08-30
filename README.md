@@ -242,4 +242,4 @@ For issues and questions:
 
 ---
 
-**Ready to upload your CV? Run `npm run dev` and start coding!** 🚀
+**Ready to upload your CV? Run `npm run dev` and start coding!** 🚀# GitHub Pages deployment with Supabase secrets
