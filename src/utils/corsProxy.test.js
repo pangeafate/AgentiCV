@@ -1,10 +1,23 @@
 /**
  * CORS Proxy Tests
  * Following TDD principles from GL-TESTING-GUIDELINES.md
+ * Using shared infrastructure from test/index.js
  */
 
+// Mock config/env.js before importing corsProxy
+jest.mock('@/config/env', () => ({
+  isProduction: jest.fn(() => false),
+  env: {
+    VITE_SUPABASE_URL: 'https://test.supabase.co',
+    VITE_SUPABASE_ANON_KEY: 'test-key',
+    VITE_N8N_COMPLETE_ANALYSIS_URL: 'https://n8n.test.com/webhook/analyze',
+    PROD: false,
+    DEV: true
+  }
+}));
+
+import { setupTest } from '@/test';
 import { fetchWithCORS, isProduction } from './corsProxy';
-import { setupTest } from '@/test/utils/testSetup';
 
 // Mock console methods
 const consoleSpy = {
@@ -24,15 +37,16 @@ Object.defineProperty(window, 'location', {
   writable: true
 });
 
+// Setup shared utilities following GL-TESTING-GUIDELINES.md
+const { getWrapper } = setupTest();
+
 describe('CORS Proxy', () => {
-  let testUtils;
   let originalFetch;
 
   beforeEach(() => {
-    testUtils = setupTest({ mockFetch: true });
     originalFetch = global.fetch;
     
-    // Clear all mocks
+    // Clear all mocks using shared infrastructure
     jest.clearAllMocks();
     Object.values(consoleSpy).forEach(spy => spy.mockClear());
     
@@ -42,7 +56,6 @@ describe('CORS Proxy', () => {
   });
 
   afterEach(() => {
-    testUtils.cleanup();
     global.fetch = originalFetch;
   });
 

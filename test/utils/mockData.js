@@ -124,22 +124,37 @@ export function createMockAnalysis(overrides = {}) {
 /**
  * Create mock file for upload testing
  * @param {Object} overrides - Custom properties to override defaults
- * @returns {File} Mock file object
+ * @returns {File} Mock file object with proper text() method
  */
 export function createMockFile(overrides = {}) {
   const defaults = {
     name: 'test-cv.pdf',
     type: 'application/pdf',
     size: 1024 * 1024, // 1MB
-    lastModified: Date.now()
+    lastModified: Date.now(),
+    content: 'mock file content'
   };
   
   const props = { ...defaults, ...overrides };
   
-  return new File(['mock file content'], props.name, {
+  // Create file with specified content - allow explicit empty string
+  const fileContent = props.content !== undefined ? props.content : 'mock file content';
+  const file = new File([fileContent], props.name, {
     type: props.type,
     lastModified: props.lastModified
   });
+  
+  // Override size property to match what was requested
+  Object.defineProperty(file, 'size', {
+    value: props.size,
+    writable: false,
+    configurable: true
+  });
+  
+  // Mock the text() method to return the content
+  file.text = jest.fn().mockResolvedValue(fileContent);
+  
+  return file;
 }
 
 /**

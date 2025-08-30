@@ -1,39 +1,36 @@
 /**
  * PDF Extractor Tests
  * Following TDD principles from GL-TESTING-GUIDELINES.md
+ * Using shared infrastructure from test/index.js
  */
 
+import { setupTest, createMockFile } from '@/test';
 import { extractTextFromPDF, extractTextFromFile } from './pdfExtractor';
-import { setupTest } from '@/test/utils/testSetup';
 
-// Mock console methods
+// Mock console methods using shared infrastructure
 const consoleSpy = {
   log: jest.spyOn(console, 'log').mockImplementation(() => {}),
   warn: jest.spyOn(console, 'warn').mockImplementation(() => {}),
   error: jest.spyOn(console, 'error').mockImplementation(() => {})
 };
 
-describe('PDF Extractor', () => {
-  let testUtils;
+// Setup shared utilities following GL-TESTING-GUIDELINES.md
+const { getWrapper } = setupTest();
 
+describe('PDF Extractor', () => {
   beforeEach(() => {
-    testUtils = setupTest({ mockFetch: false });
-    
-    // Clear all mocks
+    // Clear all mocks using shared infrastructure
     jest.clearAllMocks();
     Object.values(consoleSpy).forEach(spy => spy.mockClear());
   });
 
-  afterEach(() => {
-    testUtils.cleanup();
-  });
-
   describe('extractTextFromPDF', () => {
     const createMockPDFFile = (name = 'test.pdf', size = 1024) => {
-      return new File(['PDF content'], name, {
+      return createMockFile({
+        name,
         type: 'application/pdf',
         size,
-        lastModified: Date.now()
+        content: 'PDF content'
       });
     };
 
@@ -108,8 +105,10 @@ describe('PDF Extractor', () => {
     describe('Text files', () => {
       it('should extract text from plain text files', async () => {
         const textContent = 'This is a plain text resume.\nName: John Doe\nSkills: JavaScript, React';
-        const textFile = new File([textContent], 'resume.txt', {
-          type: 'text/plain'
+        const textFile = createMockFile({
+          name: 'resume.txt',
+          type: 'text/plain',
+          content: textContent
         });
 
         const result = await extractTextFromFile(textFile);
@@ -118,8 +117,10 @@ describe('PDF Extractor', () => {
       });
 
       it('should handle empty text files', async () => {
-        const emptyFile = new File([''], 'empty.txt', {
-          type: 'text/plain'
+        const emptyFile = createMockFile({
+          name: 'empty.txt',
+          type: 'text/plain',
+          content: ''
         });
 
         const result = await extractTextFromFile(emptyFile);
@@ -129,8 +130,10 @@ describe('PDF Extractor', () => {
 
       it('should handle large text files', async () => {
         const largeContent = 'Line of text\n'.repeat(10000);
-        const largeFile = new File([largeContent], 'large.txt', {
-          type: 'text/plain'
+        const largeFile = createMockFile({
+          name: 'large.txt',
+          type: 'text/plain',
+          content: largeContent
         });
 
         const result = await extractTextFromFile(largeFile);
@@ -141,8 +144,10 @@ describe('PDF Extractor', () => {
 
       it('should handle text files with special characters', async () => {
         const specialContent = 'Résumé\n名前: 田中太郎\n© 2024 All rights reserved\n';
-        const specialFile = new File([specialContent], 'special.txt', {
-          type: 'text/plain'
+        const specialFile = createMockFile({
+          name: 'special.txt',
+          type: 'text/plain',
+          content: specialContent
         });
 
         const result = await extractTextFromFile(specialFile);
@@ -156,9 +161,11 @@ describe('PDF Extractor', () => {
 
     describe('PDF files', () => {
       it('should return placeholder text for PDF files', async () => {
-        const pdfFile = new File(['PDF content'], 'resume.pdf', {
+        const pdfFile = createMockFile({
+          name: 'resume.pdf',
           type: 'application/pdf',
-          size: 2048
+          size: 2048,
+          content: 'PDF content'
         });
 
         const result = await extractTextFromFile(pdfFile);
@@ -169,9 +176,11 @@ describe('PDF Extractor', () => {
       });
 
       it('should handle PDF files with different sizes', async () => {
-        const largePdfFile = new File(['Large PDF content'], 'large-cv.pdf', {
+        const largePdfFile = createMockFile({
+          name: 'large-cv.pdf',
           type: 'application/pdf',
-          size: 5 * 1024 * 1024 // 5MB
+          size: 5 * 1024 * 1024,
+          content: 'Large PDF content'
         });
 
         const result = await extractTextFromFile(largePdfFile);
@@ -183,9 +192,11 @@ describe('PDF Extractor', () => {
 
     describe('Word documents', () => {
       it('should return placeholder text for DOC files', async () => {
-        const docFile = new File(['DOC content'], 'resume.doc', {
+        const docFile = createMockFile({
+          name: 'resume.doc',
           type: 'application/msword',
-          size: 3072
+          size: 3072,
+          content: 'DOC content'
         });
 
         const result = await extractTextFromFile(docFile);
@@ -196,9 +207,11 @@ describe('PDF Extractor', () => {
       });
 
       it('should return placeholder text for DOCX files', async () => {
-        const docxFile = new File(['DOCX content'], 'resume.docx', {
+        const docxFile = createMockFile({
+          name: 'resume.docx',
           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          size: 4096
+          size: 4096,
+          content: 'DOCX content'
         });
 
         const result = await extractTextFromFile(docxFile);
@@ -216,9 +229,11 @@ describe('PDF Extractor', () => {
         ];
 
         for (const testCase of testCases) {
-          const file = new File(['content'], testCase.name, {
+          const file = createMockFile({
+            name: testCase.name,
             type: testCase.type,
-            size: testCase.size
+            size: testCase.size,
+            content: 'content'
           });
 
           const result = await extractTextFromFile(file);
@@ -299,8 +314,10 @@ describe('PDF Extractor', () => {
       });
 
       it('should handle file with undefined name', async () => {
-        const file = new File(['content'], undefined, {
-          type: 'text/plain'
+        const file = createMockFile({
+          name: undefined,
+          type: 'text/plain',
+          content: 'content'
         });
 
         // This should work as File constructor handles undefined name
@@ -309,16 +326,26 @@ describe('PDF Extractor', () => {
       });
 
       it('should handle text extraction errors gracefully', async () => {
-        const mockFile = new File(['content'], 'error.txt', {
-          type: 'text/plain'
+        // Suppress console errors for this test
+        const originalError = console.error;
+        console.error = jest.fn();
+        
+        const mockFile = createMockFile({
+          name: 'error.txt',
+          type: 'text/plain',
+          content: 'content'
         });
 
-        // Mock text() method to throw error
+        // Mock text() method to return rejected promise
         mockFile.text = jest.fn().mockRejectedValue(new Error('Read error'));
-
+        
         const result = await extractTextFromFile(mockFile);
 
         expect(result).toBe('[Unable to extract text from file: error.txt]');
+        expect(mockFile.text).toHaveBeenCalled();
+        
+        // Restore console.error
+        console.error = originalError;
       });
 
       it('should handle very large files', async () => {
