@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
+<<<<<<< HEAD
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -22,6 +23,14 @@
     "test:e2e:local": "playwright test --config=playwright.config.js --project=local",
     "test:e2e:deployed": "playwright test --config=playwright.config.js --project=deployed",
     "test:e2e:debug": "playwright test --debug"
+=======
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:local": "playwright test --config=playwright.config.js --project=local",
+    "test:deployed": "playwright test --config=playwright.config.js --project=deployed",
+    "test:debug": "playwright test --debug"
+>>>>>>> 39ad05531d1a68129ae4e6f4dd6a12c0ac2f841c
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
@@ -35,6 +44,7 @@
     "react-hot-toast": "^2.4.1"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@babel/core": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
@@ -42,20 +52,29 @@
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+=======
+    "@playwright/test": "^1.40.0",
+>>>>>>> 39ad05531d1a68129ae4e6f4dd6a12c0ac2f841c
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.15",
+<<<<<<< HEAD
     "babel-jest": "^30.1.1",
     "babel-plugin-transform-import-meta": "^2.3.3",
+=======
+>>>>>>> 39ad05531d1a68129ae4e6f4dd6a12c0ac2f841c
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "gh-pages": "^6.0.0",
+<<<<<<< HEAD
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.1.1",
     "jest-environment-jsdom": "^30.1.1",
+=======
+>>>>>>> 39ad05531d1a68129ae4e6f4dd6a12c0ac2f841c
     "postcss": "^8.4.29",
     "tailwindcss": "^3.3.3",
     "vite": "^4.4.5"
