@@ -28,9 +28,28 @@ const AnalysisControl = ({
       // Call the main analysis endpoint with both CV and JD
       // Use proxy if configured, otherwise direct webhook
       const useProxy = shouldUseProxy();
-      const apiUrl = useProxy
+      let apiUrl = useProxy
         ? `${env.VITE_PROXY_SERVER_URL}/api/n8n/analyze-complete`
         : env.VITE_N8N_COMPLETE_ANALYSIS_URL;
+      
+      // CRITICAL: Detect malformed URL from GitHub secrets
+      if (apiUrl && (apiUrl.includes('--body') || apiUrl.includes('"') || apiUrl.includes('\n'))) {
+        console.error('🚨 CRITICAL ERROR: Malformed N8N webhook URL detected!');
+        console.error('Current value:', JSON.stringify(apiUrl));
+        console.error('The GitHub secret VITE_N8N_COMPLETE_ANALYSIS_URL contains invalid characters.');
+        console.error('It should be ONLY the URL: https://n8n.lakestrom.com/webhook/get_cvjd');
+        console.error('Please fix the GitHub secret by removing quotes, --body prefix, and newlines.');
+        
+        // Try to extract the actual URL
+        const urlMatch = apiUrl.match(/https?:\/\/[^\s"]+/);
+        if (urlMatch) {
+          const cleanUrl = urlMatch[0];
+          console.warn('🔧 Attempting to use cleaned URL:', cleanUrl);
+          apiUrl = cleanUrl;
+        } else {
+          throw new Error('Invalid N8N webhook URL. Please fix the VITE_N8N_COMPLETE_ANALYSIS_URL GitHub secret to contain ONLY: https://n8n.lakestrom.com/webhook/get_cvjd');
+        }
+      }
       
       console.log(`Using ${useProxy ? 'proxy' : 'direct webhook'} API:`, apiUrl);
       console.log('Configuration:', { isProduction: isProduction(), useProxy, apiUrl });
@@ -213,7 +232,9 @@ const AnalysisControl = ({
       console.error('🔥 Analysis failed with error:', {
         message: err.message,
         stack: err.stack,
-        apiUrl: apiUrl,
+        apiUrl: useProxy 
+          ? `http://localhost:3002/api/n8n/analyze-complete`
+          : env.VITE_N8N_COMPLETE_ANALYSIS_URL || 'https://n8n.lakestrom.com/webhook/get_cvjd',
         useProxy: useProxy,
         environment: isProd ? 'production' : 'development',
         origin: window.location.origin,
