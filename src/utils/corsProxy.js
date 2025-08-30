@@ -1,5 +1,6 @@
 // CORS proxy helper for production
 // This uses a public CORS proxy as a fallback when direct requests fail
+import { isProduction as checkIsProduction } from '@/config/env';
 
 export const fetchWithCORS = async (url, options = {}) => {
   // First, try direct request
@@ -52,5 +53,5 @@ export const fetchWithCORS = async (url, options = {}) => {
 
 // Helper to check if we're in production
 export const isProduction = () => {
-  return import.meta.env.PROD || window.location.hostname !== 'localhost';
+  return checkIsProduction();
 };

@@ -30,7 +30,7 @@ export default defineConfig({
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        baseURL: 'http://localhost:5174',
+        baseURL: 'http://localhost:5173',
       },
     },
     {
@@ -44,35 +44,35 @@ export default defineConfig({
       name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
-        baseURL: 'http://localhost:5174'
+        baseURL: 'http://localhost:5173'
       },
     },
     {
       name: 'webkit',
       use: { 
         ...devices['Desktop Safari'],
-        baseURL: 'http://localhost:5174'
+        baseURL: 'http://localhost:5173'
       },
     },
     {
       name: 'Mobile Chrome',
       use: { 
         ...devices['Pixel 5'],
-        baseURL: 'http://localhost:5174'
+        baseURL: 'http://localhost:5173'
       },
     },
     {
       name: 'Mobile Safari',
       use: { 
         ...devices['iPhone 12'],
-        baseURL: 'http://localhost:5174'
+        baseURL: 'http://localhost:5173'
       },
     },
   ],
 
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:5174',
+    url: 'http://localhost:5173',
     reuseExistingServer: true,
     timeout: 120 * 1000,
   },

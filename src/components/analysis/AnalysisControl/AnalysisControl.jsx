@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { env, isProduction } from '@/config/env';
 
 const AnalysisControl = ({ 
   cvReady, 
@@ -26,12 +27,12 @@ const AnalysisControl = ({
       
       // Call the main analysis endpoint with both CV and JD
       // Use proxy in development, direct webhook in production
-      const isProduction = import.meta.env.PROD;
-      const apiUrl = isProduction
-        ? import.meta.env.VITE_N8N_COMPLETE_ANALYSIS_URL || 'https://n8n.lakestrom.com/webhook/get_cvjd'
+      const isProd = isProduction();
+      const apiUrl = isProd
+        ? env.VITE_N8N_COMPLETE_ANALYSIS_URL || 'https://n8n.lakestrom.com/webhook/get_cvjd'
         : 'http://localhost:3002/api/n8n/analyze-complete';
       
-      console.log(`Using ${isProduction ? 'production' : 'development'} API:`, apiUrl);
+      console.log(`Using ${isProd ? 'production' : 'development'} API:`, apiUrl);
       
       const fetchOptions = {
         method: 'POST',
@@ -46,7 +47,7 @@ const AnalysisControl = ({
       };
       
       // In production, we may need to handle CORS differently
-      if (isProduction) {
+      if (isProd) {
         fetchOptions.mode = 'cors';
       }
       

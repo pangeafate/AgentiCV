@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'jsdom',
-  setupFiles: ['<rootDir>/test/setup/supabaseMock.js'],
+  setupFiles: ['<rootDir>/test/setup/supabaseMock.js', '<rootDir>/test/setup/importMetaMock.js'],
   setupFilesAfterEnv: ['<rootDir>/test/utils/testSetup.js'],
   moduleNameMapper: {
     '^@/test$': '<rootDir>/test/index.js',
@@ -33,15 +33,4 @@ module.exports = {
     'node_modules/(?!(@supabase|@testing-library)/)'
   ],
   moduleFileExtensions: ['js', 'jsx', 'json'],
-  globals: {
-    'import.meta': {
-      env: {
-        VITE_SUPABASE_URL: 'https://test.supabase.co',
-        VITE_SUPABASE_ANON_KEY: 'test-key',
-        VITE_N8N_COMPLETE_ANALYSIS_URL: 'https://n8n.test.com/webhook/analyze',
-        PROD: false,
-        DEV: true
-      }
-    }
-  }
 };
