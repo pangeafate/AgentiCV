@@ -26,27 +26,51 @@ const AnalysisControl = ({
       
       // Call the main analysis endpoint with both CV and JD
       // Use proxy in development, direct webhook in production
-      const apiUrl = import.meta.env.VITE_USE_PROXY === 'false' 
-        ? import.meta.env.VITE_N8N_COMPLETE_ANALYSIS_URL
+      const isProduction = import.meta.env.PROD;
+      const apiUrl = isProduction
+        ? import.meta.env.VITE_N8N_COMPLETE_ANALYSIS_URL || 'https://n8n.lakestrom.com/webhook/get_cvjd'
         : 'http://localhost:3002/api/n8n/analyze-complete';
       
-      const response = await fetch(apiUrl, {
+      console.log(`Using ${isProduction ? 'production' : 'development'} API:`, apiUrl);
+      
+      const fetchOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ 
           sessionId, 
           cvUrl,           // URL to the CV file
           jobDescription   // JD text
         })
-      });
+      };
+      
+      // In production, we may need to handle CORS differently
+      if (isProduction) {
+        fetchOptions.mode = 'cors';
+      }
+      
+      const response = await fetch(apiUrl, fetchOptions);
 
       setProgress(80);
 
       if (!response.ok) {
-        throw new Error('Failed to analyze CV and JD');
+        // Check if it's a CORS error
+        if (response.type === 'opaque' || response.status === 0) {
+          throw new Error('CORS error: The N8N webhook may not be configured to accept requests from this domain. Please ensure CORS is enabled on your N8N webhook.');
+        }
+        throw new Error(`Failed to analyze CV and JD: ${response.status} ${response.statusText}`);
       }
 
-      const analysisData = await response.json();
+      let analysisData;
+      try {
+        const responseText = await response.text();
+        console.log('Raw response text:', responseText);
+        analysisData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        throw new Error('Invalid response from N8N webhook. Please check the webhook configuration.');
+      }
       console.log('Raw N8N Analysis response:', analysisData);
       
       // Check if the response contains an N8N error (webhook not registered, etc.)
