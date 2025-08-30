@@ -74,14 +74,14 @@ export const uploadCV = async (file) => {
 
     // Generate unique file name
     const fileName = generateUniqueFileName(file.name)
-    const filePath = `cv-uploads/${fileName}`
+    const filePath = fileName  // Don't add cv-uploads prefix - bucket already handles this
 
-    console.log(`Uploading file: ${file.name} -> ${filePath}`)
+    console.log(`Uploading file: ${file.name} -> ${fileName}`)
 
     // Upload to Supabase storage
     const { data, error } = await supabase.storage
       .from(STORAGE_CONFIG.bucketName)
-      .upload(filePath, file, {
+      .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
         contentType: file.type
@@ -95,7 +95,7 @@ export const uploadCV = async (file) => {
     // Get public URL
     const { data: urlData } = supabase.storage
       .from(STORAGE_CONFIG.bucketName)
-      .getPublicUrl(filePath)
+      .getPublicUrl(fileName)
 
     // Prepare result
     const uploadResult = {
@@ -112,34 +112,7 @@ export const uploadCV = async (file) => {
       }
     }
 
-    // Trigger Flowise webhook if configured
-    if (import.meta.env.VITE_FLOWISE_WEBHOOK_URL) {
-      try {
-        const flowiseResponse = await fetch(import.meta.env.VITE_FLOWISE_WEBHOOK_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            filename: fileName,
-            filepath: filePath,
-            publicUrl: urlData.publicUrl,
-            bucket: STORAGE_CONFIG.bucketName,
-            fileType: file.type,
-            fileSize: file.size,
-            uploadedAt: new Date().toISOString()
-          })
-        })
-        
-        if (flowiseResponse.ok) {
-          uploadResult.flowiseTriggered = true
-          console.log('✅ Flowise webhook triggered successfully')
-        }
-      } catch (error) {
-        console.warn('⚠️ Flowise webhook failed:', error.message)
-        // Don't fail the upload if Flowise is unavailable
-      }
-    }
+    // No longer trigger n8n here - will be triggered when analysis button is clicked
 
     return uploadResult
 

@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import toast from 'react-hot-toast'
 import { uploadCV } from '../../../services/supabase/cv.service'
 
-const CVUploader = ({ onStatusChange }) => {
+const CVUploader = ({ onStatusChange, onUploadComplete, sessionId }) => {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadedFile, setUploadedFile] = useState(null)
@@ -64,6 +64,12 @@ const CVUploader = ({ onStatusChange }) => {
       
       onStatusChange(`✓ Upload complete: ${file.name}`)
       onStatusChange(`File stored at: ${result.path}`)
+      onStatusChange(`Ready for analysis`)
+      
+      // Notify parent component
+      if (onUploadComplete) {
+        onUploadComplete(result.url)
+      }
       
       toast.success(`CV uploaded successfully: ${file.name}`)
       
