@@ -88,7 +88,7 @@ const AnalysisControl = ({
           status: response.status,
           statusText: response.statusText,
           type: response.type,
-          headers: Object.fromEntries(response.headers.entries()),
+          headers: response.headers ? Object.fromEntries(response.headers.entries()) : {},
           url: response.url
         });
       } catch (fetchError) {
@@ -232,11 +232,11 @@ const AnalysisControl = ({
       console.error('🔥 Analysis failed with error:', {
         message: err.message,
         stack: err.stack,
-        apiUrl: useProxy 
+        apiUrl: shouldUseProxy() 
           ? `http://localhost:3002/api/n8n/analyze-complete`
           : env.VITE_N8N_COMPLETE_ANALYSIS_URL || 'https://n8n.lakestrom.com/webhook/get_cvjd',
-        useProxy: useProxy,
-        environment: isProd ? 'production' : 'development',
+        useProxy: shouldUseProxy(),
+        environment: isProduction() ? 'production' : 'development',
         origin: window.location.origin,
         N8N_URL: env.VITE_N8N_COMPLETE_ANALYSIS_URL,
         PROXY_URL: env.VITE_PROXY_SERVER_URL,

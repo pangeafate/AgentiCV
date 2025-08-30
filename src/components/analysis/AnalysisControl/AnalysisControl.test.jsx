@@ -982,6 +982,36 @@ describe('AnalysisControl Component', () => {
     });
   });
 
+  describe('Error Logging Validation', () => {
+    let user;
+
+    beforeEach(() => {
+      user = userEvent.setup({ delay: null });
+    });
+
+    it('should handle error logging without undefined variable errors', async () => {
+      // Arrange - Force an error that triggers the detailed error logging
+      global.fetch.mockRejectedValue(new Error('Test error for logging'));
+      render(<AnalysisControl {...defaultProps} />);
+
+      // Act
+      const analyzeButton = screen.getByRole('button', { name: /analyse/i });
+      await user.click(analyzeButton);
+
+      // Assert - Should not throw ReferenceError for undefined variables
+      // The error should be handled gracefully, logging should work
+      await waitFor(() => {
+        expect(screen.getByText(/error: connection failed: test error for logging/i)).toBeInTheDocument();
+      });
+
+      // Verify console.error was called without throwing undefined variable errors
+      expect(console.error).toHaveBeenCalled();
+      
+      // The component should render error state, not crash with white screen
+      expect(screen.getByRole('button', { name: /retry analysis/i })).toBeInTheDocument();
+    });
+  });
+
   describe('Data Validation', () => {
     let user;
 

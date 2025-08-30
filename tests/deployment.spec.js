@@ -203,6 +203,59 @@ test.describe('Application Deployment Tests', () => {
   });
 
   test.describe('Core Functionality Tests', () => {
+    test('should not have white screen due to JavaScript errors', async ({ page }) => {
+      const errors = [];
+      const consoleErrors = [];
+      
+      // Capture JavaScript errors
+      page.on('pageerror', error => errors.push(error.message));
+      page.on('console', msg => {
+        if (msg.type() === 'error') {
+          consoleErrors.push(msg.text());
+        }
+      });
+      
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
+      
+      // Wait for React to hydrate and render
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(2000); // Allow time for any async component initialization
+      
+      // Verify no critical JavaScript errors that would cause white screen
+      const criticalErrors = errors.filter(error => 
+        error.includes('ReferenceError') || 
+        error.includes('useProxy is not defined') ||
+        error.includes('isProd is not defined') ||
+        error.includes('Cannot read properties of undefined')
+      );
+      
+      expect(criticalErrors).toHaveLength(0);
+      
+      // Verify the app actually rendered content (not white screen)
+      const bodyText = await page.textContent('body');
+      expect(bodyText.length).toBeGreaterThan(100);
+      
+      // Verify critical components are rendered
+      await expect(page.locator('section').filter({ hasText: 'Upload CV Document' })).toBeVisible();
+      await expect(page.locator('section').filter({ hasText: 'Job Description' })).toBeVisible();
+      
+      // Verify AnalysisControl component is present and functional
+      const analysisButton = page.locator('button:text("ANALYSE")');
+      await expect(analysisButton).toBeVisible();
+      
+      // The button should initially be disabled (correct behavior)
+      await expect(analysisButton).toBeDisabled();
+      
+      // Verify no undefined variable errors in console
+      const undefinedVarErrors = consoleErrors.filter(error => 
+        error.includes('useProxy is not defined') ||
+        error.includes('isProd is not defined') ||
+        error.includes('Cannot read properties of undefined')
+      );
+      expect(undefinedVarErrors).toHaveLength(0);
+    });
+
     test('should have consistent core functionality', async ({ page }) => {
       await page.goto('/');
       await page.waitForSelector('.terminal-window', { timeout: 15000 });
