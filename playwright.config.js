@@ -34,6 +34,13 @@ export default defineConfig({
       },
     },
     {
+      name: 'deployed',
+      use: { 
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://pangeafate.github.io/AgentiCV',
+      },
+    },
+    {
       name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
