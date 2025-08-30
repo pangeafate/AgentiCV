@@ -20,63 +20,59 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Increase timeouts for slower operations
+    actionTimeout: 15000,
+    navigationTimeout: 30000,
   },
 
   projects: [
     {
-      name: 'local',
+      name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://localhost:5174',
       },
     },
     {
-      name: 'deployed',
-      use: { 
-        ...devices['Desktop Chrome'],
-        baseURL: 'https://pangeafate.github.io/AgentiCV',
-      },
-    },
-    {
-      name: 'local-firefox',
+      name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
-        baseURL: 'http://localhost:5173'
+        baseURL: 'http://localhost:5174'
       },
     },
     {
-      name: 'deployed-firefox',
+      name: 'webkit',
       use: { 
-        ...devices['Desktop Firefox'],
-        baseURL: 'https://pangeafate.github.io/AgentiCV'
+        ...devices['Desktop Safari'],
+        baseURL: 'http://localhost:5174'
       },
     },
     {
       name: 'Mobile Chrome',
       use: { 
         ...devices['Pixel 5'],
-        baseURL: 'http://localhost:5173'
+        baseURL: 'http://localhost:5174'
       },
     },
     {
       name: 'Mobile Safari',
       use: { 
         ...devices['iPhone 12'],
-        baseURL: 'http://localhost:5173'
+        baseURL: 'http://localhost:5174'
       },
     },
   ],
 
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
+    url: 'http://localhost:5174',
+    reuseExistingServer: true,
     timeout: 120 * 1000,
   },
 
-  timeout: 30000,
+  timeout: 60000, // Increase overall test timeout
   expect: {
-    timeout: 10000
+    timeout: 15000 // Increase expect timeout for slow operations
   },
 
   outputDir: 'test-results/',

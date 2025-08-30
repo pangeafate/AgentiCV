@@ -37,3 +37,7 @@ playwright/.cache
 
 # Build directories
 .vite
+# Don't commit .env files
+.env
+.env.local
+.env.production.local

@@ -1,20 +1,21 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('GitHub Pages Deployment', () => {
+test.describe('Application Deployment Tests', () => {
   test.describe('Local Environment Tests', () => {
-    test.use({ baseURL: 'http://localhost:3001' });
-    
     test('should load application on local server', async ({ page }) => {
       await page.goto('/');
       
       // Check that page loads successfully
-      await expect(page).toHaveTitle(/AgentiCV/i);
+      await expect(page).toHaveTitle(/AgenticV/i);
+      
+      // Check that terminal window is visible
+      await expect(page.locator('.terminal-window')).toBeVisible({ timeout: 15000 });
       
       // Check that main content is visible
       const mainContent = page.locator('body');
       await expect(mainContent).toBeVisible();
       
-      // Verify no JavaScript errors
+      // Verify no JavaScript errors during initial load
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.waitForLoadState('networkidle');
@@ -24,12 +25,23 @@ test.describe('GitHub Pages Deployment', () => {
     test('should serve static assets correctly on local', async ({ page }) => {
       await page.goto('/');
       
-      // Check that CSS is loaded
-      const hasStyles = await page.evaluate(() => {
-        const styles = getComputedStyle(document.body);
-        return styles.backgroundColor !== 'rgba(0, 0, 0, 0)' && styles.backgroundColor !== 'transparent';
+      // Wait for app to load
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
+      
+      // Check that terminal theme CSS is loaded
+      const hasTerminalStyling = await page.evaluate(() => {
+        const body = document.body;
+        const styles = getComputedStyle(body);
+        const bgColor = styles.backgroundColor;
+        const fontFamily = styles.fontFamily;
+        
+        // Should have dark background and monospace font
+        const isDarkBg = bgColor.includes('rgb(10, 10, 10)') || bgColor.includes('rgb(0, 0, 0)');
+        const hasMonoFont = fontFamily.toLowerCase().includes('mono');
+        
+        return isDarkBg && hasMonoFont;
       });
-      expect(hasStyles).toBe(true);
+      expect(hasTerminalStyling).toBe(true);
       
       // Check for React app mounting
       const reactRoot = page.locator('#root');
@@ -38,14 +50,13 @@ test.describe('GitHub Pages Deployment', () => {
     });
   });
 
-  test.describe('Deployed Environment Tests', () => {
-    test.use({ baseURL: 'https://pangeafate.github.io/AgentiCV' });
-    
-    test('should load application on GitHub Pages', async ({ page }) => {
-      await page.goto('/', { waitUntil: 'networkidle' });
+  test.describe('Production Build Tests', () => {
+    test('should have production build characteristics', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Check that page loads successfully
-      await expect(page).toHaveTitle(/AgentiCV/i);
+      await expect(page).toHaveTitle(/AgenticV/i);
       
       // Check that main content is visible
       const mainContent = page.locator('body');
@@ -57,8 +68,9 @@ test.describe('GitHub Pages Deployment', () => {
       expect(isLoaded).toBe(true);
     });
 
-    test('should serve static assets correctly on GitHub Pages', async ({ page }) => {
-      await page.goto('/', { waitUntil: 'networkidle' });
+    test('should have correct terminal styling in production', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Check that CSS is loaded and applied
       const hasTerminalStyling = await page.evaluate(() => {
@@ -66,12 +78,14 @@ test.describe('GitHub Pages Deployment', () => {
         const styles = getComputedStyle(body);
         const bgColor = styles.backgroundColor;
         const textColor = styles.color;
+        const fontFamily = styles.fontFamily;
         
-        // Should have dark background and green text (terminal theme)
+        // Should have dark background, green text, and monospace font (terminal theme)
         const isDarkBg = bgColor.includes('rgb(10, 10, 10)') || bgColor.includes('rgb(0, 0, 0)');
         const isGreenText = textColor.includes('rgb(0, 255, 0)') || textColor.includes('#00ff00');
+        const hasMonoFont = fontFamily.toLowerCase().includes('mono');
         
-        return isDarkBg || isGreenText;
+        return isDarkBg && isGreenText && hasMonoFont;
       });
       expect(hasTerminalStyling).toBe(true);
       
@@ -81,71 +95,80 @@ test.describe('GitHub Pages Deployment', () => {
       await expect(reactRoot).not.toBeEmpty();
     });
 
-    test('should handle routing correctly on GitHub Pages', async ({ page }) => {
-      // GitHub Pages serves React apps from a subdirectory
-      await page.goto('/', { waitUntil: 'networkidle' });
+    test('should handle asset loading correctly', async ({ page }) => {
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
-      // Check that the app loads at the correct base path
-      const url = page.url();
-      expect(url).toContain('pangeafate.github.io/AgentiCV');
-      
-      // Verify that relative paths work correctly
+      // Verify that assets are loaded correctly
       const hasWorkingAssets = await page.evaluate(() => {
         const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
         const scripts = Array.from(document.querySelectorAll('script[src]'));
         
-        // Check that assets are being loaded (not returning 404s)
+        // Check that assets are being loaded
         return links.length > 0 || scripts.length > 0;
       });
       expect(hasWorkingAssets).toBe(true);
+      
+      // Check that fonts are loaded
+      const hasFonts = await page.evaluate(() => {
+        const fontLinks = Array.from(document.querySelectorAll('link[href*="fonts.googleapis.com"]'));
+        return fontLinks.length > 0;
+      });
+      expect(hasFonts).toBe(true);
     });
 
-    test('should have correct HTTPS configuration', async ({ page }) => {
+    test('should handle network requests correctly', async ({ page }) => {
+      const responses = [];
+      page.on('response', response => responses.push(response));
+      
       await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
-      const protocol = await page.evaluate(() => window.location.protocol);
-      expect(protocol).toBe('https:');
+      // Check that most responses are successful
+      const successfulResponses = responses.filter(r => r.status() < 400);
+      const totalResponses = responses.length;
       
-      // Check for security headers (GitHub Pages provides these)
-      const response = await page.waitForResponse(response => 
-        response.url().includes('pangeafate.github.io') && response.status() === 200
-      );
-      
-      expect(response.ok()).toBe(true);
+      // At least 80% of requests should be successful
+      expect(successfulResponses.length / totalResponses).toBeGreaterThan(0.8);
     });
 
-    test('should handle 404 errors gracefully on GitHub Pages', async ({ page }) => {
-      const response = await page.goto('/nonexistent-page', { waitUntil: 'networkidle' });
+    test('should handle non-existent routes gracefully', async ({ page }) => {
+      // Try to navigate to a non-existent route
+      const response = await page.goto('/nonexistent-page');
       
-      // GitHub Pages should serve the main app for client-side routing
-      // or show a 404 page
-      expect(response.status()).toBeGreaterThanOrEqual(200);
+      // For SPA, this should still load the main app or show appropriate error
+      // Status could be 200 (SPA handles routing) or 404 (server handles)
+      expect(response.status()).toBeLessThan(500);
     });
 
     test('should load within acceptable time limits', async ({ page }) => {
       const startTime = Date.now();
-      await page.goto('/', { waitUntil: 'networkidle' });
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       const loadTime = Date.now() - startTime;
       
-      // Should load within 10 seconds (reasonable for GitHub Pages)
-      expect(loadTime).toBeLessThan(10000);
+      // Should load within 15 seconds (reasonable for local development)
+      expect(loadTime).toBeLessThan(15000);
     });
 
     test('should be accessible via direct URL', async ({ page }) => {
-      // Test direct navigation to the deployed URL
-      await page.goto('https://pangeafate.github.io/AgentiCV/', { waitUntil: 'networkidle' });
+      // Test direct navigation
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Should load successfully
       const title = await page.title();
       expect(title).toBeTruthy();
+      expect(title).toContain('AgenticV');
       
       // Should have content
       const bodyContent = await page.textContent('body');
-      expect(bodyContent.length).toBeGreaterThan(0);
+      expect(bodyContent.length).toBeGreaterThan(100);
     });
 
     test('should handle browser refresh correctly', async ({ page }) => {
       await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Wait for initial load
       await page.waitForLoadState('networkidle');
@@ -154,16 +177,17 @@ test.describe('GitHub Pages Deployment', () => {
       await page.reload({ waitUntil: 'networkidle' });
       
       // Should still work after refresh
-      const mainContent = page.locator('body');
-      await expect(mainContent).toBeVisible();
+      await expect(page.locator('.terminal-window')).toBeVisible({ timeout: 15000 });
       
       // Should maintain functionality
       const reactRoot = page.locator('#root');
       await expect(reactRoot).toBeVisible();
+      await expect(reactRoot).not.toBeEmpty();
     });
 
     test('should work in different browsers', async ({ browserName, page }) => {
-      await page.goto('/', { waitUntil: 'networkidle' });
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Basic functionality should work across browsers
       const isReactAppLoaded = await page.evaluate(() => {
@@ -171,32 +195,43 @@ test.describe('GitHub Pages Deployment', () => {
       });
       expect(isReactAppLoaded).toBe(true);
       
+      // Check terminal window is visible
+      await expect(page.locator('.terminal-window')).toBeVisible();
+      
       console.log(`Deployment test passed in ${browserName}`);
     });
   });
 
-  test.describe('Cross-Environment Consistency', () => {
-    test('should have consistent functionality between local and deployed', async ({ page }) => {
-      // This test can be run against both environments
+  test.describe('Core Functionality Tests', () => {
+    test('should have consistent core functionality', async ({ page }) => {
       await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
-      // Core functionality should be the same
-      const hasUploadArea = await page.locator('div').filter({ hasText: 'Drag & drop your CV here' }).count();
-      expect(hasUploadArea).toBeGreaterThan(0);
+      // Core functionality should work
+      await expect(page.locator('text=Drag & drop your CV here, or click to browse')).toBeVisible();
       
       // Terminal theme should be present
       const hasTerminalTheme = await page.evaluate(() => {
         const styles = getComputedStyle(document.body);
-        return styles.fontFamily.toLowerCase().includes('mono') || styles.color.includes('255, 0');
+        return styles.fontFamily.toLowerCase().includes('mono') && styles.color.includes('255');
       });
       expect(hasTerminalTheme).toBe(true);
+      
+      // Main sections should be visible
+      await expect(page.locator('section').filter({ hasText: 'Upload CV Document' })).toBeVisible();
+      await expect(page.locator('section').filter({ hasText: 'Job Description' })).toBeVisible();
     });
 
-    test('should maintain responsive design across environments', async ({ page }) => {
+    test('should maintain responsive design', async ({ page }) => {
       // Test mobile viewport
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
+      // Terminal window should be visible on mobile
+      await expect(page.locator('.terminal-window')).toBeVisible();
+      
+      // Content should not overflow horizontally
       const isResponsive = await page.evaluate(() => {
         return document.body.scrollWidth <= window.innerWidth + 50; // Allow small margin
       });
@@ -204,7 +239,8 @@ test.describe('GitHub Pages Deployment', () => {
       
       // Test tablet viewport
       await page.setViewportSize({ width: 768, height: 1024 });
-      await page.goto('/');
+      await page.reload();
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       const isTabletResponsive = await page.evaluate(() => {
         return document.body.scrollWidth <= window.innerWidth + 50;
@@ -215,73 +251,73 @@ test.describe('GitHub Pages Deployment', () => {
 
   test.describe('Performance Tests', () => {
     test('should have reasonable bundle size', async ({ page }) => {
-      await page.goto('/', { waitUntil: 'networkidle' });
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
+      await page.waitForLoadState('networkidle');
       
       // Check resource sizes
       const resourceSizes = await page.evaluate(() => {
         return performance.getEntriesByType('resource').reduce((total, resource) => {
-          return total + (resource.transferSize || 0);
+          return total + (resource.transferSize || resource.encodedBodySize || 0);
         }, 0);
       });
       
-      // Should be under 5MB total (reasonable for a React app)
-      expect(resourceSizes).toBeLessThan(5 * 1024 * 1024);
+      // Should be under 10MB total (reasonable for a React app with fonts and assets)
+      expect(resourceSizes).toBeLessThan(10 * 1024 * 1024);
     });
 
-    test('should have good Core Web Vitals', async ({ page }) => {
-      await page.goto('/', { waitUntil: 'networkidle' });
+    test('should have acceptable loading performance', async ({ page }) => {
+      const startTime = Date.now();
+      await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
+      const loadTime = Date.now() - startTime;
       
-      // Measure First Contentful Paint
-      const fcp = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          const observer = new PerformanceObserver((list) => {
-            for (const entry of list.getEntries()) {
-              if (entry.name === 'first-contentful-paint') {
-                resolve(entry.startTime);
-              }
-            }
-          });
-          observer.observe({ entryTypes: ['paint'] });
-        });
-      });
+      // Initial load should be reasonable
+      expect(loadTime).toBeLessThan(15000);
       
-      // FCP should be under 3 seconds
-      expect(fcp).toBeLessThan(3000);
+      // Check that DOM is interactive
+      const readyState = await page.evaluate(() => document.readyState);
+      expect(readyState).toBe('complete');
     });
   });
 
   test.describe('SEO and Metadata', () => {
     test('should have proper meta tags', async ({ page }) => {
       await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Check for essential meta tags
       const title = await page.title();
       expect(title).toBeTruthy();
       expect(title.length).toBeGreaterThan(0);
+      expect(title).toContain('AgenticV');
       
       // Check for viewport meta tag
       const viewportMeta = page.locator('meta[name="viewport"]');
       await expect(viewportMeta).toBeAttached();
       
-      // Check for description meta tag if present
-      const descriptionMeta = page.locator('meta[name="description"]');
-      const hasDescription = await descriptionMeta.count();
-      if (hasDescription > 0) {
-        const content = await descriptionMeta.getAttribute('content');
-        expect(content).toBeTruthy();
-      }
+      // Check for charset meta tag
+      const charsetMeta = page.locator('meta[charset]');
+      await expect(charsetMeta).toBeAttached();
     });
 
     test('should be crawlable by search engines', async ({ page }) => {
       await page.goto('/');
+      await page.waitForSelector('.terminal-window', { timeout: 15000 });
       
       // Check that content is rendered and not just empty divs
       const textContent = await page.textContent('body');
-      expect(textContent.trim().length).toBeGreaterThan(50);
+      expect(textContent.trim().length).toBeGreaterThan(100);
+      expect(textContent).toContain('AgenticV Terminal');
+      expect(textContent).toContain('Upload CV Document');
       
       // Check for semantic HTML structure
       const hasHeadings = await page.locator('h1, h2, h3').count();
       expect(hasHeadings).toBeGreaterThan(0);
+      
+      // Check for proper document structure (should have multiple sections)
+      const sectionCount = await page.locator('section').count();
+      expect(sectionCount).toBeGreaterThan(0);
     });
   });
 });

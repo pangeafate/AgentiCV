@@ -1,6 +1,9 @@
 /**
  * Mock Data Factory Functions
  * Following GL-TESTING-GUIDELINES.md
+ * 
+ * This module provides comprehensive factory functions for creating test data
+ * with the goal of reducing test setup boilerplate by 50%.
  */
 
 /**
@@ -138,3 +141,249 @@ export function createMockFile(overrides = {}) {
     lastModified: props.lastModified
   });
 }
+
+/**
+ * Create mock user data
+ * @param {Object} overrides - Custom properties to override defaults
+ * @returns {Object} Mock user data
+ */
+export function createMockUser(overrides = {}) {
+  return {
+    id: 'mock-user-id-789',
+    email: 'user@example.com',
+    name: 'John User',
+    role: 'job_seeker',
+    created_at: new Date().toISOString(),
+    profile: {
+      phone: '+1234567890',
+      location: 'Remote',
+      preferred_job_types: ['full-time'],
+      experience_level: 'mid-level'
+    },
+    settings: {
+      notifications: {
+        email: true,
+        job_alerts: true
+      }
+    },
+    ...overrides
+  };
+}
+
+/**
+ * Create mock API response
+ * @param {Object} data - Response data
+ * @param {Object} options - Response options (status, headers, etc.)
+ * @returns {Object} Mock API response
+ */
+export function createMockApiResponse(data, options = {}) {
+  const {
+    status = 200,
+    statusText = 'OK',
+    headers = {},
+    delay = 0
+  } = options;
+
+  const response = {
+    ok: status >= 200 && status < 300,
+    status,
+    statusText,
+    headers: new Headers(headers),
+    json: () => Promise.resolve(data),
+    text: () => Promise.resolve(JSON.stringify(data)),
+    blob: () => Promise.resolve(new Blob([JSON.stringify(data)])),
+    clone: () => response
+  };
+
+  if (delay > 0) {
+    return new Promise(resolve => setTimeout(() => resolve(response), delay));
+  }
+
+  return Promise.resolve(response);
+}
+
+/**
+ * Create mock upload progress event
+ * @param {number} loaded - Bytes loaded
+ * @param {number} total - Total bytes
+ * @returns {Object} Mock progress event
+ */
+export function createMockProgressEvent(loaded, total) {
+  return {
+    lengthComputable: true,
+    loaded,
+    total,
+    type: 'progress',
+    target: {
+      status: loaded < total ? 0 : 200,
+      readyState: loaded < total ? 1 : 4
+    }
+  };
+}
+
+/**
+ * Create mock form data for testing form submissions
+ * @param {Object} fields - Form fields as key-value pairs
+ * @returns {FormData} Mock FormData object
+ */
+export function createMockFormData(fields = {}) {
+  const formData = new FormData();
+  Object.entries(fields).forEach(([key, value]) => {
+    if (value instanceof File) {
+      formData.append(key, value);
+    } else if (Array.isArray(value)) {
+      value.forEach(item => formData.append(key, item));
+    } else {
+      formData.append(key, String(value));
+    }
+  });
+  return formData;
+}
+
+/**
+ * Factory for creating multiple related test data items
+ */
+export const TestDataFactory = {
+  /**
+   * Create a complete CV-JD-Analysis scenario
+   * @param {Object} overrides - Overrides for each component
+   * @returns {Object} Complete test scenario
+   */
+  createCompleteScenario: (overrides = {}) => {
+    const cv = createMockCV(overrides.cv);
+    const jd = createMockJobDescription(overrides.jd);
+    const analysis = createMockAnalysis({
+      cvId: cv.id,
+      jdId: jd.id,
+      ...overrides.analysis
+    });
+    const user = createMockUser(overrides.user);
+
+    return { cv, jd, analysis, user };
+  },
+
+  /**
+   * Create multiple CVs with different skill sets
+   * @param {number} count - Number of CVs to create
+   * @returns {Array} Array of mock CVs
+   */
+  createMultipleCVs: (count = 3) => {
+    const skillSets = [
+      ['React', 'JavaScript', 'CSS'],
+      ['Python', 'Django', 'PostgreSQL'],
+      ['Java', 'Spring', 'MySQL'],
+      ['Node.js', 'Express', 'MongoDB'],
+      ['Angular', 'TypeScript', 'RxJS']
+    ];
+
+    return Array.from({ length: count }, (_, index) => 
+      createMockCV({
+        id: `cv-${index + 1}`,
+        name: `Developer ${index + 1}`,
+        skills: skillSets[index % skillSets.length]
+      })
+    );
+  },
+
+  /**
+   * Create multiple job descriptions with different requirements
+   * @param {number} count - Number of JDs to create
+   * @returns {Array} Array of mock job descriptions
+   */
+  createMultipleJDs: (count = 3) => {
+    const positions = [
+      { title: 'Frontend Developer', skills: ['React', 'JavaScript', 'CSS'] },
+      { title: 'Backend Developer', skills: ['Python', 'Django', 'PostgreSQL'] },
+      { title: 'Full Stack Developer', skills: ['Node.js', 'React', 'MongoDB'] }
+    ];
+
+    return Array.from({ length: count }, (_, index) => {
+      const position = positions[index % positions.length];
+      return createMockJobDescription({
+        id: `jd-${index + 1}`,
+        job_title: position.title,
+        required_skills: position.skills
+      });
+    });
+  },
+
+  /**
+   * Create file upload scenario with progress simulation
+   * @param {Object} options - Upload options
+   * @returns {Object} Upload test scenario
+   */
+  createUploadScenario: (options = {}) => {
+    const {
+      fileSize = 1024 * 1024,
+      fileName = 'test-cv.pdf',
+      progressSteps = 5,
+      uploadDelay = 100
+    } = options;
+
+    const file = createMockFile({ name: fileName, size: fileSize });
+    const progressEvents = Array.from({ length: progressSteps }, (_, index) => {
+      const loaded = Math.floor((fileSize / progressSteps) * (index + 1));
+      return createMockProgressEvent(loaded, fileSize);
+    });
+
+    const simulateUpload = () => {
+      return new Promise((resolve) => {
+        let stepIndex = 0;
+        const progressInterval = setInterval(() => {
+          if (stepIndex < progressEvents.length) {
+            // Trigger progress event (in real test, this would be handled by the component)
+            stepIndex++;
+          } else {
+            clearInterval(progressInterval);
+            resolve(createMockApiResponse({ path: 'uploads/' + fileName }));
+          }
+        }, uploadDelay);
+      });
+    };
+
+    return {
+      file,
+      progressEvents,
+      simulateUpload,
+      expectedResponse: { path: 'uploads/' + fileName }
+    };
+  },
+
+  /**
+   * Create error scenarios for testing error handling
+   * @param {string} type - Type of error scenario
+   * @returns {Object} Error test scenario
+   */
+  createErrorScenario: (type = 'api') => {
+    const scenarios = {
+      api: {
+        error: new Error('API Error'),
+        response: createMockApiResponse(
+          { error: 'Internal Server Error' },
+          { status: 500, statusText: 'Internal Server Error' }
+        )
+      },
+      network: {
+        error: new Error('Network Error'),
+        response: Promise.reject(new Error('Failed to fetch'))
+      },
+      validation: {
+        error: new Error('Validation Error'),
+        response: createMockApiResponse(
+          { errors: { email: 'Email is required' } },
+          { status: 400, statusText: 'Bad Request' }
+        )
+      },
+      upload: {
+        error: new Error('Upload failed'),
+        file: createMockFile({ size: 10 * 1024 * 1024 }), // 10MB file
+        response: createMockApiResponse(
+          { error: 'File too large' },
+          { status: 413, statusText: 'Payload Too Large' }
+        )
+      }
+    };
+
+    return scenarios[type] || scenarios.api;
+  }
+};

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "cv-001",
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@email.com",
+    "phone": "+1-555-0123",
+    "location": "New York, NY",
+    "summary": "Full-stack developer with 7 years of experience in building scalable web applications",
+    "skills": ["JavaScript", "TypeScript", "React", "Node.js", "Python", "AWS", "Docker", "PostgreSQL"],
+    "experience": [
+      {
+        "company": "Tech Solutions Inc",
+        "position": "Senior Software Engineer",
+        "duration": "2020 - Present",
+        "responsibilities": [
+          "Led team of 5 developers in building microservices architecture",
+          "Reduced API response time by 40% through optimization",
+          "Implemented CI/CD pipeline using GitHub Actions"
+        ]
+      },
+      {
+        "company": "StartupXYZ",
+        "position": "Software Developer",
+        "duration": "2017 - 2020",
+        "responsibilities": [
+          "Built React components for e-commerce platform",
+          "Developed RESTful APIs using Node.js and Express",
+          "Managed PostgreSQL database optimization"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "MS Computer Science",
+        "institution": "MIT",
+        "graduation": "2017"
+      }
+    ]
+  },
+  {
+    "id": "cv-002",
+    "name": "Michael Chen",
+    "email": "michael.chen@email.com",
+    "phone": "+1-555-0456",
+    "location": "San Francisco, CA",
+    "summary": "Frontend specialist with expertise in React and modern JavaScript frameworks",
+    "skills": ["React", "Vue.js", "JavaScript", "CSS", "HTML", "Webpack", "Jest", "Cypress"],
+    "experience": [
+      {
+        "company": "Digital Agency Co",
+        "position": "Frontend Developer",
+        "duration": "2019 - Present",
+        "responsibilities": [
+          "Developed responsive web applications using React",
+          "Implemented design systems and component libraries",
+          "Achieved 95% test coverage with Jest and Cypress"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "BS Computer Science",
+        "institution": "UC Berkeley",
+        "graduation": "2019"
+      }
+    ]
+  },
+  {
+    "id": "cv-003",
+    "name": "Emily Rodriguez",
+    "email": "emily.rodriguez@email.com",
+    "phone": "+1-555-0789",
+    "location": "Austin, TX",
+    "summary": "Data scientist with 4 years of experience in machine learning and data analysis",
+    "skills": ["Python", "R", "SQL", "TensorFlow", "PyTorch", "Pandas", "NumPy", "Scikit-learn"],
+    "experience": [
+      {
+        "company": "DataTech Corp",
+        "position": "Senior Data Scientist",
+        "duration": "2021 - Present",
+        "responsibilities": [
+          "Developed machine learning models for customer segmentation",
+          "Improved model accuracy by 25% through feature engineering",
+          "Led data pipeline automation using Apache Airflow"
+        ]
+      },
+      {
+        "company": "Analytics Startup",
+        "position": "Data Analyst",
+        "duration": "2019 - 2021",
+        "responsibilities": [
+          "Created dashboards and reports using Tableau",
+          "Performed statistical analysis on customer behavior data",
+          "Collaborated with product team on A/B testing"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "MS Data Science",
+        "institution": "University of Texas at Austin",
+        "graduation": "2019"
+      }
+    ]
+  },
+  {
+    "id": "cv-004",
+    "name": "David Kim",
+    "email": "david.kim@email.com",
+    "phone": "+1-555-0321",
+    "location": "Seattle, WA",
+    "summary": "DevOps engineer specializing in cloud infrastructure and automation",
+    "skills": ["AWS", "Kubernetes", "Docker", "Terraform", "Jenkins", "Python", "Bash", "Monitoring"],
+    "experience": [
+      {
+        "company": "Cloud Solutions Ltd",
+        "position": "DevOps Engineer",
+        "duration": "2020 - Present",
+        "responsibilities": [
+          "Managed AWS infrastructure serving 1M+ users",
+          "Implemented Infrastructure as Code using Terraform",
+          "Reduced deployment time by 60% through automation"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "BS Information Technology",
+        "institution": "University of Washington",
+        "graduation": "2018"
+      }
+    ]
+  },
+  {
+    "id": "cv-005",
+    "name": "Jessica Thompson",
+    "email": "jessica.thompson@email.com",
+    "phone": "+1-555-0654",
+    "location": "Remote",
+    "summary": "Mobile developer with expertise in React Native and native iOS development",
+    "skills": ["React Native", "Swift", "iOS", "JavaScript", "Xcode", "Firebase", "Redux", "TypeScript"],
+    "experience": [
+      {
+        "company": "Mobile Innovations Inc",
+        "position": "Senior Mobile Developer",
+        "duration": "2018 - Present",
+        "responsibilities": [
+          "Built and maintained React Native apps with 500K+ downloads",
+          "Implemented push notifications and real-time features",
+          "Led mobile app performance optimization initiatives"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "BS Computer Engineering",
+        "institution": "Georgia Tech",
+        "graduation": "2018"
+      }
+    ]
+  }
+]

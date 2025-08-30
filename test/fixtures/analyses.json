@@ -1,0 +1,487 @@
+[
+  {
+    "id": "analysis-001",
+    "cvId": "cv-001",
+    "jdId": "jd-001",
+    "cv_highlighting": [
+      {
+        "address": "skills[0]",
+        "class": "highlight-match",
+        "reason": "JavaScript experience aligns with full-stack requirements"
+      },
+      {
+        "address": "skills[1]",
+        "class": "highlight-match",
+        "reason": "TypeScript is a required skill"
+      },
+      {
+        "address": "skills[2]",
+        "class": "highlight-match",
+        "reason": "React expertise matches job requirements"
+      },
+      {
+        "address": "skills[3]",
+        "class": "highlight-match",
+        "reason": "Node.js is a required backend skill"
+      },
+      {
+        "address": "skills[5]",
+        "class": "highlight-match",
+        "reason": "AWS cloud experience required"
+      },
+      {
+        "address": "skills[6]",
+        "class": "highlight-partial",
+        "reason": "Docker is a preferred skill"
+      },
+      {
+        "address": "skills[7]",
+        "class": "highlight-match",
+        "reason": "PostgreSQL database experience required"
+      },
+      {
+        "address": "experience[0].responsibilities[0]",
+        "class": "highlight-match",
+        "reason": "Leadership experience aligns with senior role"
+      },
+      {
+        "address": "experience[0].responsibilities[2]",
+        "class": "highlight-partial",
+        "reason": "CI/CD experience is valuable for DevOps aspects"
+      }
+    ],
+    "jd_highlighting": [
+      {
+        "address": "required_skills[0]",
+        "class": "highlight-match",
+        "reason": "Candidate has strong React experience"
+      },
+      {
+        "address": "required_skills[1]",
+        "class": "highlight-match",
+        "reason": "Node.js experience demonstrated"
+      },
+      {
+        "address": "required_skills[2]",
+        "class": "highlight-match",
+        "reason": "TypeScript skills present"
+      },
+      {
+        "address": "required_skills[3]",
+        "class": "highlight-match",
+        "reason": "AWS experience confirmed"
+      },
+      {
+        "address": "required_skills[4]",
+        "class": "highlight-match",
+        "reason": "PostgreSQL database skills present"
+      },
+      {
+        "address": "preferred_skills[0]",
+        "class": "highlight-match",
+        "reason": "Docker experience available"
+      },
+      {
+        "address": "preferred_skills[1]",
+        "class": "highlight-gap",
+        "reason": "No Kubernetes experience found"
+      },
+      {
+        "address": "preferred_skills[2]",
+        "class": "highlight-gap",
+        "reason": "GraphQL experience not evident"
+      }
+    ],
+    "match_score": {
+      "overall": 85,
+      "skills": 80,
+      "experience": 90,
+      "education": 100,
+      "qualifications": 75
+    },
+    "gaps": ["Kubernetes", "GraphQL", "Redis"],
+    "recommendations": [
+      "Gain hands-on experience with Kubernetes for container orchestration",
+      "Learn GraphQL to enhance API development skills",
+      "Add Redis experience for caching and session management",
+      "Consider certifications in AWS to strengthen cloud credentials"
+    ]
+  },
+  {
+    "id": "analysis-002",
+    "cvId": "cv-002",
+    "jdId": "jd-002",
+    "cv_highlighting": [
+      {
+        "address": "skills[0]",
+        "class": "highlight-match",
+        "reason": "React is a required skill"
+      },
+      {
+        "address": "skills[2]",
+        "class": "highlight-match",
+        "reason": "JavaScript expertise required"
+      },
+      {
+        "address": "skills[3]",
+        "class": "highlight-match",
+        "reason": "CSS skills essential for frontend"
+      },
+      {
+        "address": "skills[4]",
+        "class": "highlight-match",
+        "reason": "HTML knowledge required"
+      },
+      {
+        "address": "skills[6]",
+        "class": "highlight-partial",
+        "reason": "Jest testing experience is preferred"
+      },
+      {
+        "address": "experience[0].responsibilities[1]",
+        "class": "highlight-match",
+        "reason": "Component library experience valuable"
+      }
+    ],
+    "jd_highlighting": [
+      {
+        "address": "required_skills[0]",
+        "class": "highlight-match",
+        "reason": "Strong React experience demonstrated"
+      },
+      {
+        "address": "required_skills[1]",
+        "class": "highlight-match",
+        "reason": "JavaScript skills confirmed"
+      },
+      {
+        "address": "required_skills[2]",
+        "class": "highlight-match",
+        "reason": "CSS expertise present"
+      },
+      {
+        "address": "required_skills[3]",
+        "class": "highlight-match",
+        "reason": "HTML knowledge confirmed"
+      },
+      {
+        "address": "preferred_skills[0]",
+        "class": "highlight-gap",
+        "reason": "TypeScript experience not found"
+      },
+      {
+        "address": "preferred_skills[1]",
+        "class": "highlight-gap",
+        "reason": "Next.js experience missing"
+      },
+      {
+        "address": "preferred_skills[3]",
+        "class": "highlight-match",
+        "reason": "Jest testing experience available"
+      }
+    ],
+    "match_score": {
+      "overall": 78,
+      "skills": 75,
+      "experience": 80,
+      "education": 85,
+      "qualifications": 70
+    },
+    "gaps": ["TypeScript", "Next.js", "Tailwind CSS"],
+    "recommendations": [
+      "Learn TypeScript to improve type safety and meet preferred requirements",
+      "Gain experience with Next.js framework for React applications",
+      "Explore Tailwind CSS for utility-first styling approach",
+      "Consider expanding backend knowledge for full-stack opportunities"
+    ]
+  },
+  {
+    "id": "analysis-003",
+    "cvId": "cv-003",
+    "jdId": "jd-003",
+    "cv_highlighting": [
+      {
+        "address": "skills[0]",
+        "class": "highlight-match",
+        "reason": "Python is a required skill for data science"
+      },
+      {
+        "address": "skills[2]",
+        "class": "highlight-match",
+        "reason": "SQL database skills required"
+      },
+      {
+        "address": "skills[3]",
+        "class": "highlight-partial",
+        "reason": "TensorFlow is a preferred machine learning framework"
+      },
+      {
+        "address": "skills[4]",
+        "class": "highlight-partial",
+        "reason": "PyTorch is a preferred framework"
+      },
+      {
+        "address": "skills[5]",
+        "class": "highlight-match",
+        "reason": "Pandas is essential for data analysis"
+      },
+      {
+        "address": "experience[0].responsibilities[0]",
+        "class": "highlight-match",
+        "reason": "Machine learning model development experience"
+      },
+      {
+        "address": "experience[1].responsibilities[1]",
+        "class": "highlight-match",
+        "reason": "Statistical analysis experience demonstrated"
+      }
+    ],
+    "jd_highlighting": [
+      {
+        "address": "required_skills[0]",
+        "class": "highlight-match",
+        "reason": "Strong Python programming skills"
+      },
+      {
+        "address": "required_skills[1]",
+        "class": "highlight-match",
+        "reason": "SQL expertise confirmed"
+      },
+      {
+        "address": "required_skills[2]",
+        "class": "highlight-match",
+        "reason": "Machine learning experience demonstrated"
+      },
+      {
+        "address": "required_skills[3]",
+        "class": "highlight-match",
+        "reason": "Statistics background confirmed"
+      },
+      {
+        "address": "required_skills[4]",
+        "class": "highlight-match",
+        "reason": "Pandas experience available"
+      },
+      {
+        "address": "preferred_skills[0]",
+        "class": "highlight-match",
+        "reason": "TensorFlow experience present"
+      },
+      {
+        "address": "preferred_skills[1]",
+        "class": "highlight-match",
+        "reason": "PyTorch skills available"
+      },
+      {
+        "address": "preferred_skills[2]",
+        "class": "highlight-gap",
+        "reason": "AWS cloud experience not evident"
+      }
+    ],
+    "match_score": {
+      "overall": 88,
+      "skills": 85,
+      "experience": 90,
+      "education": 95,
+      "qualifications": 85
+    },
+    "gaps": ["AWS", "Spark", "Docker"],
+    "recommendations": [
+      "Develop AWS cloud platform skills for data processing",
+      "Learn Apache Spark for big data processing",
+      "Gain Docker experience for model deployment and containerization",
+      "Consider additional visualization tools beyond current experience"
+    ]
+  },
+  {
+    "id": "analysis-004",
+    "cvId": "cv-004",
+    "jdId": "jd-004",
+    "cv_highlighting": [
+      {
+        "address": "skills[0]",
+        "class": "highlight-match",
+        "reason": "AWS expertise is a required skill"
+      },
+      {
+        "address": "skills[1]",
+        "class": "highlight-match",
+        "reason": "Kubernetes experience required"
+      },
+      {
+        "address": "skills[2]",
+        "class": "highlight-match",
+        "reason": "Docker containerization skills required"
+      },
+      {
+        "address": "skills[3]",
+        "class": "highlight-partial",
+        "reason": "Terraform is preferred for Infrastructure as Code"
+      },
+      {
+        "address": "skills[4]",
+        "class": "highlight-partial",
+        "reason": "Jenkins experience valuable for CI/CD"
+      },
+      {
+        "address": "experience[0].responsibilities[1]",
+        "class": "highlight-match",
+        "reason": "Infrastructure as Code experience with Terraform"
+      },
+      {
+        "address": "experience[0].responsibilities[2]",
+        "class": "highlight-match",
+        "reason": "Automation experience aligns with role requirements"
+      }
+    ],
+    "jd_highlighting": [
+      {
+        "address": "required_skills[0]",
+        "class": "highlight-match",
+        "reason": "Strong AWS cloud platform experience"
+      },
+      {
+        "address": "required_skills[1]",
+        "class": "highlight-match",
+        "reason": "Docker containerization skills present"
+      },
+      {
+        "address": "required_skills[2]",
+        "class": "highlight-match",
+        "reason": "Kubernetes orchestration experience confirmed"
+      },
+      {
+        "address": "required_skills[3]",
+        "class": "highlight-match",
+        "reason": "CI/CD experience with Jenkins"
+      },
+      {
+        "address": "required_skills[4]",
+        "class": "highlight-match",
+        "reason": "Infrastructure as Code with Terraform"
+      },
+      {
+        "address": "preferred_skills[0]",
+        "class": "highlight-match",
+        "reason": "Terraform experience available"
+      },
+      {
+        "address": "preferred_skills[1]",
+        "class": "highlight-gap",
+        "reason": "Ansible configuration management missing"
+      },
+      {
+        "address": "preferred_skills[2]",
+        "class": "highlight-match",
+        "reason": "Monitoring experience available"
+      }
+    ],
+    "match_score": {
+      "overall": 92,
+      "skills": 90,
+      "experience": 95,
+      "education": 85,
+      "qualifications": 95
+    },
+    "gaps": ["Ansible"],
+    "recommendations": [
+      "Learn Ansible for configuration management to complement existing skills",
+      "Consider expanding monitoring stack knowledge (Prometheus, Grafana)",
+      "Explore multi-cloud strategies beyond AWS",
+      "Develop security automation and compliance skills"
+    ]
+  },
+  {
+    "id": "analysis-005",
+    "cvId": "cv-005",
+    "jdId": "jd-005",
+    "cv_highlighting": [
+      {
+        "address": "skills[0]",
+        "class": "highlight-match",
+        "reason": "React Native is a required skill"
+      },
+      {
+        "address": "skills[1]",
+        "class": "highlight-partial",
+        "reason": "Swift is a preferred skill for native iOS"
+      },
+      {
+        "address": "skills[2]",
+        "class": "highlight-match",
+        "reason": "iOS development experience required"
+      },
+      {
+        "address": "skills[3]",
+        "class": "highlight-match",
+        "reason": "JavaScript skills essential"
+      },
+      {
+        "address": "skills[5]",
+        "class": "highlight-partial",
+        "reason": "Firebase experience is preferred"
+      },
+      {
+        "address": "skills[7]",
+        "class": "highlight-partial",
+        "reason": "TypeScript is a preferred skill"
+      },
+      {
+        "address": "experience[0].responsibilities[0]",
+        "class": "highlight-match",
+        "reason": "Published app experience with significant user base"
+      }
+    ],
+    "jd_highlighting": [
+      {
+        "address": "required_skills[0]",
+        "class": "highlight-match",
+        "reason": "Strong React Native experience"
+      },
+      {
+        "address": "required_skills[1]",
+        "class": "highlight-match",
+        "reason": "iOS development skills present"
+      },
+      {
+        "address": "required_skills[2]",
+        "class": "highlight-gap",
+        "reason": "Android development experience not evident"
+      },
+      {
+        "address": "required_skills[3]",
+        "class": "highlight-match",
+        "reason": "JavaScript expertise confirmed"
+      },
+      {
+        "address": "preferred_skills[0]",
+        "class": "highlight-match",
+        "reason": "Swift native development skills"
+      },
+      {
+        "address": "preferred_skills[2]",
+        "class": "highlight-match",
+        "reason": "Firebase backend experience"
+      },
+      {
+        "address": "preferred_skills[4]",
+        "class": "highlight-match",
+        "reason": "TypeScript skills available"
+      }
+    ],
+    "match_score": {
+      "overall": 82,
+      "skills": 80,
+      "experience": 85,
+      "education": 85,
+      "qualifications": 80
+    },
+    "gaps": ["Android", "Kotlin"],
+    "recommendations": [
+      "Develop Android development skills to complement iOS expertise",
+      "Learn Kotlin for native Android development",
+      "Expand cross-platform framework knowledge",
+      "Consider mobile app testing and deployment automation"
+    ]
+  }
+]

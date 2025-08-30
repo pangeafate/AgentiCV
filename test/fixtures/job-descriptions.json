@@ -1,0 +1,140 @@
+[
+  {
+    "id": "jd-001",
+    "job_title": "Senior Full Stack Developer",
+    "company_name": "Innovation Labs",
+    "location": "New York, NY (Hybrid)",
+    "required_skills": ["React", "Node.js", "TypeScript", "AWS", "PostgreSQL"],
+    "preferred_skills": ["Docker", "Kubernetes", "GraphQL", "Redis"],
+    "required_experience": [
+      "5+ years of full-stack development experience",
+      "Experience with microservices architecture",
+      "Strong understanding of cloud services (AWS preferred)",
+      "Experience leading development teams"
+    ],
+    "required_education": [
+      "Bachelor's degree in Computer Science or related field",
+      "Master's degree preferred"
+    ],
+    "key_responsibilities": [
+      "Design and implement scalable web applications",
+      "Lead technical architecture decisions",
+      "Mentor junior developers",
+      "Collaborate with product and design teams"
+    ]
+  },
+  {
+    "id": "jd-002",
+    "job_title": "Frontend Engineer",
+    "company_name": "TechStart",
+    "location": "Remote",
+    "required_skills": ["React", "JavaScript", "CSS", "HTML", "Git"],
+    "preferred_skills": ["TypeScript", "Next.js", "Tailwind CSS", "Jest"],
+    "required_experience": [
+      "3+ years of frontend development",
+      "Experience with modern JavaScript frameworks",
+      "Understanding of responsive design principles"
+    ],
+    "required_education": [
+      "Bachelor's degree in Computer Science or equivalent experience"
+    ],
+    "key_responsibilities": [
+      "Build user interfaces with React",
+      "Ensure cross-browser compatibility",
+      "Write maintainable and testable code",
+      "Participate in code reviews"
+    ]
+  },
+  {
+    "id": "jd-003",
+    "job_title": "Data Scientist",
+    "company_name": "AI Solutions Corp",
+    "location": "San Francisco, CA",
+    "required_skills": ["Python", "SQL", "Machine Learning", "Statistics", "Pandas"],
+    "preferred_skills": ["TensorFlow", "PyTorch", "AWS", "Spark", "Docker"],
+    "required_experience": [
+      "3+ years of data science experience",
+      "Experience with machine learning algorithms",
+      "Strong statistical analysis skills",
+      "Experience with data visualization tools"
+    ],
+    "required_education": [
+      "Master's degree in Data Science, Statistics, or related field"
+    ],
+    "key_responsibilities": [
+      "Develop and deploy machine learning models",
+      "Analyze large datasets to extract insights",
+      "Create data pipelines and workflows",
+      "Present findings to stakeholders"
+    ]
+  },
+  {
+    "id": "jd-004",
+    "job_title": "DevOps Engineer",
+    "company_name": "CloudTech Industries",
+    "location": "Austin, TX",
+    "required_skills": ["AWS", "Docker", "Kubernetes", "CI/CD", "Infrastructure as Code"],
+    "preferred_skills": ["Terraform", "Ansible", "Monitoring", "Python", "Bash"],
+    "required_experience": [
+      "4+ years of DevOps or Infrastructure experience",
+      "Experience with container orchestration",
+      "Knowledge of cloud platforms (AWS, Azure, or GCP)",
+      "Experience with automation tools"
+    ],
+    "required_education": [
+      "Bachelor's degree in Computer Science, Engineering, or related field"
+    ],
+    "key_responsibilities": [
+      "Manage cloud infrastructure and deployments",
+      "Implement CI/CD pipelines",
+      "Monitor system performance and reliability",
+      "Automate infrastructure provisioning"
+    ]
+  },
+  {
+    "id": "jd-005",
+    "job_title": "Mobile App Developer",
+    "company_name": "Mobile First Co",
+    "location": "Remote",
+    "required_skills": ["React Native", "iOS", "Android", "JavaScript", "Mobile UI/UX"],
+    "preferred_skills": ["Swift", "Kotlin", "Firebase", "Redux", "TypeScript"],
+    "required_experience": [
+      "3+ years of mobile app development",
+      "Experience with cross-platform frameworks",
+      "Published apps on App Store and Google Play",
+      "Understanding of mobile performance optimization"
+    ],
+    "required_education": [
+      "Bachelor's degree in Computer Science or equivalent experience"
+    ],
+    "key_responsibilities": [
+      "Develop and maintain mobile applications",
+      "Implement mobile-specific features and optimizations",
+      "Collaborate with designers on user experience",
+      "Ensure app performance and security"
+    ]
+  },
+  {
+    "id": "jd-006",
+    "job_title": "Backend Engineer",
+    "company_name": "ScaleTech Solutions",
+    "location": "Seattle, WA",
+    "required_skills": ["Node.js", "Python", "PostgreSQL", "API Design", "Microservices"],
+    "preferred_skills": ["AWS", "Redis", "GraphQL", "Docker", "MongoDB"],
+    "required_experience": [
+      "4+ years of backend development",
+      "Experience with distributed systems",
+      "Strong database design skills",
+      "Experience with high-traffic applications"
+    ],
+    "required_education": [
+      "Bachelor's degree in Computer Science or related field"
+    ],
+    "key_responsibilities": [
+      "Design and implement RESTful APIs",
+      "Optimize database queries and performance",
+      "Build scalable backend services",
+      "Ensure system security and reliability"
+    ]
+  }
+]

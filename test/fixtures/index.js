@@ -1,143 +1,179 @@
 /**
  * Test Fixtures
  * Realistic test data for integration testing
+ * Following GL-TESTING-GUIDELINES.md
  */
 
-export const cvs = [
-  {
-    id: 'cv-001',
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
-    phone: '+1-555-0123',
-    location: 'New York, NY',
-    summary: 'Full-stack developer with 7 years of experience in building scalable web applications',
-    skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'AWS', 'Docker', 'PostgreSQL'],
-    experience: [
-      {
-        company: 'Tech Solutions Inc',
-        position: 'Senior Software Engineer',
-        duration: '2020 - Present',
-        responsibilities: [
-          'Led team of 5 developers in building microservices architecture',
-          'Reduced API response time by 40% through optimization',
-          'Implemented CI/CD pipeline using GitHub Actions'
-        ]
-      },
-      {
-        company: 'StartupXYZ',
-        position: 'Software Developer',
-        duration: '2017 - 2020',
-        responsibilities: [
-          'Built React components for e-commerce platform',
-          'Developed RESTful APIs using Node.js and Express',
-          'Managed PostgreSQL database optimization'
-        ]
-      }
-    ],
-    education: [
-      {
-        degree: 'MS Computer Science',
-        institution: 'MIT',
-        graduation: '2017'
-      }
-    ]
-  },
-  {
-    id: 'cv-002',
-    name: 'Michael Chen',
-    email: 'michael.chen@email.com',
-    phone: '+1-555-0456',
-    location: 'San Francisco, CA',
-    summary: 'Frontend specialist with expertise in React and modern JavaScript frameworks',
-    skills: ['React', 'Vue.js', 'JavaScript', 'CSS', 'HTML', 'Webpack', 'Jest', 'Cypress'],
-    experience: [
-      {
-        company: 'Digital Agency Co',
-        position: 'Frontend Developer',
-        duration: '2019 - Present',
-        responsibilities: [
-          'Developed responsive web applications using React',
-          'Implemented design systems and component libraries',
-          'Achieved 95% test coverage with Jest and Cypress'
-        ]
-      }
-    ],
-    education: [
-      {
-        degree: 'BS Computer Science',
-        institution: 'UC Berkeley',
-        graduation: '2019'
-      }
-    ]
-  }
-];
+// Import JSON fixtures for better maintainability
+import cvsData from './cvs.json';
+import jobDescriptionsData from './job-descriptions.json';
+import analysesData from './analyses.json';
+import usersData from './users.json';
 
-export const jobDescriptions = [
-  {
-    id: 'jd-001',
-    job_title: 'Senior Full Stack Developer',
-    company_name: 'Innovation Labs',
-    location: 'New York, NY (Hybrid)',
-    required_skills: ['React', 'Node.js', 'TypeScript', 'AWS', 'PostgreSQL'],
-    preferred_skills: ['Docker', 'Kubernetes', 'GraphQL', 'Redis'],
-    required_experience: [
-      '5+ years of full-stack development experience',
-      'Experience with microservices architecture',
-      'Strong understanding of cloud services (AWS preferred)',
-      'Experience leading development teams'
-    ],
-    required_education: [
-      'Bachelor\'s degree in Computer Science or related field',
-      'Master\'s degree preferred'
-    ],
-    key_responsibilities: [
-      'Design and implement scalable web applications',
-      'Lead technical architecture decisions',
-      'Mentor junior developers',
-      'Collaborate with product and design teams'
-    ]
-  },
-  {
-    id: 'jd-002',
-    job_title: 'Frontend Engineer',
-    company_name: 'TechStart',
-    location: 'Remote',
-    required_skills: ['React', 'JavaScript', 'CSS', 'HTML', 'Git'],
-    preferred_skills: ['TypeScript', 'Next.js', 'Tailwind CSS', 'Jest'],
-    required_experience: [
-      '3+ years of frontend development',
-      'Experience with modern JavaScript frameworks',
-      'Understanding of responsive design principles'
-    ],
-    required_education: [
-      'Bachelor\'s degree in Computer Science or equivalent experience'
-    ],
-    key_responsibilities: [
-      'Build user interfaces with React',
-      'Ensure cross-browser compatibility',
-      'Write maintainable and testable code',
-      'Participate in code reviews'
-    ]
-  }
-];
+// Re-export JSON data
+export const cvs = cvsData;
+export const jobDescriptions = jobDescriptionsData;
+export const analyses = analysesData;
+export const users = usersData;
 
-export const analyses = [
-  {
-    id: 'analysis-001',
-    cvId: 'cv-001',
-    jdId: 'jd-001',
-    match_score: {
-      overall: 85,
-      skills: 80,
-      experience: 90,
-      education: 100,
-      qualifications: 75
+/**
+ * Fixture utilities for easier test data management
+ */
+export const FixtureUtils = {
+  /**
+   * Get CV by ID
+   * @param {string} id - CV ID
+   * @returns {Object|null} CV data
+   */
+  getCVById: (id) => cvs.find(cv => cv.id === id) || null,
+
+  /**
+   * Get job description by ID
+   * @param {string} id - Job description ID
+   * @returns {Object|null} Job description data
+   */
+  getJobDescriptionById: (id) => jobDescriptions.find(jd => jd.id === id) || null,
+
+  /**
+   * Get analysis by ID
+   * @param {string} id - Analysis ID
+   * @returns {Object|null} Analysis data
+   */
+  getAnalysisById: (id) => analyses.find(analysis => analysis.id === id) || null,
+
+  /**
+   * Get user by ID
+   * @param {string} id - User ID
+   * @returns {Object|null} User data
+   */
+  getUserById: (id) => users.find(user => user.id === id) || null,
+
+  /**
+   * Get CVs by skill
+   * @param {string} skill - Skill to search for
+   * @returns {Array} Array of CVs with the skill
+   */
+  getCVsBySkill: (skill) => cvs.filter(cv => 
+    cv.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
+  ),
+
+  /**
+   * Get job descriptions by required skill
+   * @param {string} skill - Skill to search for
+   * @returns {Array} Array of job descriptions requiring the skill
+   */
+  getJobDescriptionsBySkill: (skill) => jobDescriptions.filter(jd => 
+    jd.required_skills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
+  ),
+
+  /**
+   * Get users by role
+   * @param {string} role - User role
+   * @returns {Array} Array of users with the role
+   */
+  getUsersByRole: (role) => users.filter(user => user.role === role),
+
+  /**
+   * Get analysis by CV and JD combination
+   * @param {string} cvId - CV ID
+   * @param {string} jdId - Job description ID
+   * @returns {Object|null} Analysis data
+   */
+  getAnalysisByCvAndJd: (cvId, jdId) => analyses.find(analysis => 
+    analysis.cvId === cvId && analysis.jdId === jdId
+  ) || null,
+
+  /**
+   * Create a subset of data for testing
+   * @param {string} type - Type of data ('cvs', 'jobDescriptions', 'analyses', 'users')
+   * @param {number} count - Number of items to return
+   * @returns {Array} Subset of data
+   */
+  getSubset: (type, count = 2) => {
+    const dataMap = {
+      cvs,
+      jobDescriptions,
+      analyses,
+      users
+    };
+    
+    const data = dataMap[type] || [];
+    return data.slice(0, count);
+  },
+
+  /**
+   * Get realistic test combinations for CV-JD matching
+   * @returns {Array} Array of CV-JD pairs with expected match data
+   */
+  getMatchingPairs: () => [
+    {
+      cv: cvs[0], // Sarah Johnson - Full-stack
+      jd: jobDescriptions[0], // Senior Full Stack Developer
+      expectedMatch: analyses[0],
+      matchReason: 'Full-stack developer with matching skills'
     },
-    gaps: ['TypeScript', 'Kubernetes', 'GraphQL'],
-    recommendations: [
-      'Add TypeScript experience to improve technical match',
-      'Gain experience with Kubernetes for container orchestration',
-      'Learn GraphQL to meet preferred skills'
-    ]
+    {
+      cv: cvs[1], // Michael Chen - Frontend
+      jd: jobDescriptions[1], // Frontend Engineer
+      expectedMatch: analyses[1],
+      matchReason: 'Frontend specialist with React expertise'
+    },
+    {
+      cv: cvs[2], // Emily Rodriguez - Data Scientist
+      jd: jobDescriptions[2], // Data Scientist
+      expectedMatch: analyses[2],
+      matchReason: 'Data scientist with ML experience'
+    }
+  ],
+
+  /**
+   * Generate random test data based on existing patterns
+   * @param {string} type - Type of data to generate
+   * @param {Object} overrides - Properties to override
+   * @returns {Object} Generated test data
+   */
+  generateTestData: (type, overrides = {}) => {
+    const generators = {
+      cv: () => ({
+        id: `test-cv-${Date.now()}`,
+        name: 'Test User',
+        email: 'test@example.com',
+        skills: ['JavaScript', 'React'],
+        experience: [],
+        education: [],
+        ...overrides
+      }),
+      jobDescription: () => ({
+        id: `test-jd-${Date.now()}`,
+        job_title: 'Test Position',
+        company_name: 'Test Company',
+        required_skills: ['JavaScript'],
+        preferred_skills: [],
+        ...overrides
+      }),
+      user: () => ({
+        id: `test-user-${Date.now()}`,
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'job_seeker',
+        ...overrides
+      }),
+      analysis: () => ({
+        id: `test-analysis-${Date.now()}`,
+        cvId: 'test-cv-id',
+        jdId: 'test-jd-id',
+        match_score: { overall: 75 },
+        gaps: [],
+        recommendations: [],
+        ...overrides
+      })
+    };
+
+    const generator = generators[type];
+    if (!generator) {
+      throw new Error(`Unknown test data type: ${type}`);
+    }
+
+    return generator();
   }
-];
+};
