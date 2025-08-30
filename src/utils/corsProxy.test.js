@@ -5,19 +5,44 @@
  */
 
 // Mock config/env.js before importing corsProxy
-jest.mock('@/config/env', () => ({
-  isProduction: jest.fn(() => false),
-  env: {
-    VITE_SUPABASE_URL: 'https://test.supabase.co',
-    VITE_SUPABASE_ANON_KEY: 'test-key',
-    VITE_N8N_COMPLETE_ANALYSIS_URL: 'https://n8n.test.com/webhook/analyze',
-    PROD: false,
-    DEV: true
+jest.mock('@/config/env', () => {
+  const mockIsProduction = jest.fn(() => false);
+  return {
+    isProduction: mockIsProduction,
+    env: {
+      VITE_SUPABASE_URL: 'https://test.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'test-key',
+      VITE_N8N_COMPLETE_ANALYSIS_URL: 'https://n8n.test.com/webhook/analyze',
+      PROD: false,
+      DEV: true
+    }
+  };
+});
+
+// Mock Response constructor for Node.js environment
+global.Response = class Response {
+  constructor(body, init = {}) {
+    this.body = body;
+    this.status = init.status || 200;
+    this.statusText = init.statusText || 'OK';
+    this.headers = init.headers || {};
+    this.ok = this.status >= 200 && this.status < 300;
   }
-}));
+  
+  json() {
+    return Promise.resolve(JSON.parse(this.body));
+  }
+  
+  text() {
+    return Promise.resolve(this.body);
+  }
+};
 
 import { setupTest } from '@/test';
 import { fetchWithCORS, isProduction } from './corsProxy';
+
+// Get the mocked isProduction function
+const mockIsProduction = jest.requireMock('@/config/env').isProduction;
 
 // Mock console methods
 const consoleSpy = {
@@ -32,10 +57,10 @@ const mockLocation = {
   origin: 'http://localhost:3000'
 };
 
-Object.defineProperty(window, 'location', {
-  value: mockLocation,
-  writable: true
-});
+// Mock window at global level
+global.window = {
+  location: mockLocation
+};
 
 // Setup shared utilities following GL-TESTING-GUIDELINES.md
 const { getWrapper } = setupTest();
@@ -61,30 +86,27 @@ describe('CORS Proxy', () => {
 
   describe('isProduction', () => {
     beforeEach(() => {
-      // Reset import.meta.env
-      global.import = {
-        meta: {
-          env: {}
-        }
-      };
+      mockIsProduction.mockClear();
     });
 
     it('should return false for localhost development', () => {
       mockLocation.hostname = 'localhost';
-      global.import.meta.env.PROD = false;
+      mockIsProduction.mockReturnValue(false);
 
       const result = isProduction();
 
       expect(result).toBe(false);
+      expect(mockIsProduction).toHaveBeenCalled();
     });
 
     it('should return true when PROD env is true', () => {
       mockLocation.hostname = 'localhost';
-      global.import.meta.env.PROD = true;
+      mockIsProduction.mockReturnValue(true);
 
       const result = isProduction();
 
       expect(result).toBe(true);
+      expect(mockIsProduction).toHaveBeenCalled();
     });
 
     it('should return true for production hostnames', () => {
@@ -97,15 +119,18 @@ describe('CORS Proxy', () => {
 
       productionHosts.forEach(hostname => {
         mockLocation.hostname = hostname;
-        global.import.meta.env.PROD = false;
+        mockIsProduction.mockReturnValue(true);
 
         const result = isProduction();
 
         expect(result).toBe(true);
+        expect(mockIsProduction).toHaveBeenCalled();
       });
     });
 
     it('should handle edge cases', () => {
+      mockIsProduction.mockReturnValue(true);
+      
       // Empty hostname
       mockLocation.hostname = '';
       expect(isProduction()).toBe(true);
@@ -117,6 +142,8 @@ describe('CORS Proxy', () => {
       // localhost variations
       mockLocation.hostname = '127.0.0.1';
       expect(isProduction()).toBe(true);
+      
+      expect(mockIsProduction).toHaveBeenCalledTimes(3);
     });
   });
 

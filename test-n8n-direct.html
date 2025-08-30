@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>N8N Direct Test</title>
+</head>
+<body>
+    <h1>Testing N8N Webhook Direct Call</h1>
+    <button onclick="testWebhook()">Test N8N Webhook</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testWebhook() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('https://n8n.lakestrom.com/webhook/get_cvjd', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        sessionId: 'test-session-123',
+                        cvUrl: 'https://test.com/cv.pdf',
+                        jobDescription: 'Test job description'
+                    })
+                });
+                
+                resultEl.textContent = `Status: ${response.status} ${response.statusText}\n`;
+                resultEl.textContent += `Type: ${response.type}\n`;
+                resultEl.textContent += `Headers:\n`;
+                
+                for (let [key, value] of response.headers) {
+                    resultEl.textContent += `  ${key}: ${value}\n`;
+                }
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    resultEl.textContent += `\nResponse Body:\n${data}`;
+                } else {
+                    resultEl.textContent += `\nError: Could not fetch data`;
+                }
+            } catch (error) {
+                resultEl.textContent = `Error: ${error.message}\n`;
+                resultEl.textContent += `\nThis likely means CORS is blocking the request.`;
+            }
+        }
+    </script>
+</body>
+</html>

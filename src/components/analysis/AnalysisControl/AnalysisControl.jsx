@@ -54,10 +54,34 @@ const AnalysisControl = ({
       
       let response;
       try {
+        console.log('🔄 Attempting to fetch from:', apiUrl);
+        console.log('📦 Request payload:', JSON.stringify({ sessionId, cvUrl, jobDescription }, null, 2));
+        console.log('🔧 Fetch options:', {
+          method: fetchOptions.method,
+          headers: fetchOptions.headers,
+          mode: fetchOptions.mode,
+          bodyLength: fetchOptions.body?.length
+        });
+        
         response = await fetch(apiUrl, fetchOptions);
+        
+        console.log('📡 Response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          type: response.type,
+          headers: Object.fromEntries(response.headers.entries()),
+          url: response.url
+        });
       } catch (fetchError) {
         // Network-level errors (no internet, server unreachable, etc.)
-        console.error('Fetch error:', fetchError);
+        console.error('❌ Fetch error details:', {
+          name: fetchError.name,
+          message: fetchError.message,
+          stack: fetchError.stack,
+          apiUrl: apiUrl,
+          useProxy: useProxy,
+          origin: window.location.origin
+        });
         if (fetchError.name === 'TypeError' && fetchError.message.includes('fetch')) {
           throw new Error(`Network error: Unable to connect to ${useProxy ? 'proxy server' : 'N8N webhook'}. Please check your internet connection and try again.`);
         }
@@ -68,14 +92,28 @@ const AnalysisControl = ({
 
       if (!response.ok) {
         // Enhanced CORS error detection
+        console.error('⚠️ Response not OK:', {
+          status: response.status,
+          statusText: response.statusText,
+          type: response.type,
+          url: response.url,
+          redirected: response.redirected,
+          isCORSLikelyIssue: response.type === 'opaque' || response.status === 0 || 
+                             (response.status === 400 && response.statusText === '') ||
+                             response.type === 'error'
+        });
+        
         if (response.type === 'opaque' || response.status === 0 || 
             (response.status === 400 && response.statusText === '') ||
             response.type === 'error') {
           const corsErrorMsg = useProxy 
             ? `CORS error: Unable to reach the proxy server at ${env.VITE_PROXY_SERVER_URL}. Please ensure the proxy server is running and accessible.`
             : `CORS error: The N8N webhook at ${env.VITE_N8N_COMPLETE_ANALYSIS_URL} is not configured to accept requests from this domain (${window.location.origin}). This is common when running from GitHub Pages. You can enable proxy mode by setting VITE_USE_PROXY_IN_PROD=true in your environment.`;
+          console.error('🚫 CORS Error Detected:', corsErrorMsg);
           throw new Error(corsErrorMsg);
         }
+        
+        console.error('❌ HTTP Error:', `${response.status} ${response.statusText}`);
         throw new Error(`Failed to analyze CV and JD: ${response.status} ${response.statusText}`);
       }
 
@@ -172,7 +210,19 @@ const AnalysisControl = ({
       onAnalysisComplete(processedData);
 
     } catch (err) {
-      console.error('Analysis failed:', err);
+      console.error('🔥 Analysis failed with error:', {
+        message: err.message,
+        stack: err.stack,
+        apiUrl: apiUrl,
+        useProxy: useProxy,
+        environment: isProd ? 'production' : 'development',
+        origin: window.location.origin,
+        N8N_URL: env.VITE_N8N_COMPLETE_ANALYSIS_URL,
+        PROXY_URL: env.VITE_PROXY_SERVER_URL,
+        USE_PROXY_IN_PROD: env.VITE_USE_PROXY_IN_PROD,
+        timestamp: new Date().toISOString()
+      });
+      console.error('Full error object:', err);
       
       // Enhanced error categorization
       let errorMessage = err.message;
@@ -180,15 +230,20 @@ const AnalysisControl = ({
       
       if (err.message.includes('CORS error')) {
         errorType = 'CORS_ERROR';
+        console.error('🚫 CORS ERROR DETECTED - The webhook is blocking cross-origin requests');
       } else if (err.message.includes('N8N_WEBHOOK_NOT_ACTIVE') || err.message.includes('webhook') && err.message.includes('not registered')) {
         errorType = 'WEBHOOK_NOT_ACTIVE';
+        console.error('⚠️ WEBHOOK NOT ACTIVE - The N8N workflow needs to be activated');
       } else if (err.message.includes('N8N_ERROR')) {
         errorType = 'N8N_SERVICE_ERROR';
+        console.error('❌ N8N SERVICE ERROR - The webhook responded with an error');
       } else if (err.message.includes('Invalid N8N response') || err.message.includes('Missing required analysis')) {
         errorType = 'INVALID_RESPONSE';
+        console.error('⚠️ INVALID RESPONSE - The webhook returned unexpected data format');
       } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
         errorType = 'NETWORK_ERROR';
         errorMessage = `Network error: Unable to connect to ${useProxy ? 'proxy server' : 'N8N webhook'}. Please check your internet connection and try again.`;
+        console.error('🌐 NETWORK ERROR - Unable to reach the server');
       }
       
       setError({ message: errorMessage, type: errorType });
