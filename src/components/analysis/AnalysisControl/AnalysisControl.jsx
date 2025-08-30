@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { env, isProduction } from '@/config/env';
+import { env, isProduction, shouldUseProxy } from '@/config/env';
 
 const AnalysisControl = ({ 
   cvReady, 
@@ -26,13 +26,14 @@ const AnalysisControl = ({
       setProgress(50);
       
       // Call the main analysis endpoint with both CV and JD
-      // Use proxy in development, direct webhook in production
-      const isProd = isProduction();
-      const apiUrl = isProd
-        ? env.VITE_N8N_COMPLETE_ANALYSIS_URL || 'https://n8n.lakestrom.com/webhook/get_cvjd'
-        : 'http://localhost:3002/api/n8n/analyze-complete';
+      // Use proxy if configured, otherwise direct webhook
+      const useProxy = shouldUseProxy();
+      const apiUrl = useProxy
+        ? `${env.VITE_PROXY_SERVER_URL}/api/n8n/analyze-complete`
+        : env.VITE_N8N_COMPLETE_ANALYSIS_URL;
       
-      console.log(`Using ${isProd ? 'production' : 'development'} API:`, apiUrl);
+      console.log(`Using ${useProxy ? 'proxy' : 'direct webhook'} API:`, apiUrl);
+      console.log('Configuration:', { isProduction: isProduction(), useProxy, apiUrl });
       
       const fetchOptions = {
         method: 'POST',
@@ -46,19 +47,34 @@ const AnalysisControl = ({
         })
       };
       
-      // In production, we may need to handle CORS differently
-      if (isProd) {
+      // Set CORS mode for direct webhook calls
+      if (!useProxy) {
         fetchOptions.mode = 'cors';
       }
       
-      const response = await fetch(apiUrl, fetchOptions);
+      let response;
+      try {
+        response = await fetch(apiUrl, fetchOptions);
+      } catch (fetchError) {
+        // Network-level errors (no internet, server unreachable, etc.)
+        console.error('Fetch error:', fetchError);
+        if (fetchError.name === 'TypeError' && fetchError.message.includes('fetch')) {
+          throw new Error(`Network error: Unable to connect to ${useProxy ? 'proxy server' : 'N8N webhook'}. Please check your internet connection and try again.`);
+        }
+        throw new Error(`Connection failed: ${fetchError.message}`);
+      }
 
       setProgress(80);
 
       if (!response.ok) {
-        // Check if it's a CORS error
-        if (response.type === 'opaque' || response.status === 0) {
-          throw new Error('CORS error: The N8N webhook may not be configured to accept requests from this domain. Please ensure CORS is enabled on your N8N webhook.');
+        // Enhanced CORS error detection
+        if (response.type === 'opaque' || response.status === 0 || 
+            (response.status === 400 && response.statusText === '') ||
+            response.type === 'error') {
+          const corsErrorMsg = useProxy 
+            ? `CORS error: Unable to reach the proxy server at ${env.VITE_PROXY_SERVER_URL}. Please ensure the proxy server is running and accessible.`
+            : `CORS error: The N8N webhook at ${env.VITE_N8N_COMPLETE_ANALYSIS_URL} is not configured to accept requests from this domain (${window.location.origin}). This is common when running from GitHub Pages. You can enable proxy mode by setting VITE_USE_PROXY_IN_PROD=true in your environment.`;
+          throw new Error(corsErrorMsg);
         }
         throw new Error(`Failed to analyze CV and JD: ${response.status} ${response.statusText}`);
       }
@@ -108,24 +124,41 @@ const AnalysisControl = ({
           }
           
           // Structure the data according to what GapAnalysisResults expects
+          // NEVER create fake/placeholder data - require valid response from N8N
+          if (!parsedOutput.cv_highlighting || !parsedOutput.jd_highlighting || !parsedOutput.match_score) {
+            throw new Error('Invalid N8N response: Missing required analysis data (cv_highlighting, jd_highlighting, or match_score)');
+          }
+          
           processedData = {
-            cvData: cvUrl ? 'CV content processed' : null, // Placeholder - ideally should come from response
+            cvData: parsedOutput.cv_content || null, // Use actual CV content from N8N response
             jdData: jobDescription || null,
             analysis: {
-              cv_highlighting: parsedOutput.cv_highlighting || [],
-              jd_highlighting: parsedOutput.jd_highlighting || [],
-              match_score: parsedOutput.match_score || {}
+              cv_highlighting: parsedOutput.cv_highlighting,
+              jd_highlighting: parsedOutput.jd_highlighting,
+              match_score: parsedOutput.match_score
             }
           };
         } else {
-          // Fallback for direct response format
+          // Direct response format - validate it has required structure
+          if (!responseData.analysis || 
+              !responseData.analysis.cv_highlighting || 
+              !responseData.analysis.jd_highlighting || 
+              !responseData.analysis.match_score) {
+            throw new Error('Invalid N8N response format: Missing required analysis structure');
+          }
           processedData = responseData;
         }
         
         console.log('Final processed data structure:', processedData);
         
-        if (!processedData) {
-          throw new Error('Unable to parse response data');
+        if (!processedData || !processedData.analysis) {
+          throw new Error('No valid analysis data received from N8N webhook');
+        }
+        
+        // Final validation - ensure we have actual analysis results, not mock data
+        const { cv_highlighting, jd_highlighting, match_score } = processedData.analysis;
+        if (!cv_highlighting.length && !jd_highlighting.length && (!match_score.score && match_score.score !== 0)) {
+          throw new Error('N8N webhook returned empty analysis results. Please check the workflow is properly configured and processing the data.');
         }
         
       } catch (parseError) {
@@ -140,7 +173,25 @@ const AnalysisControl = ({
 
     } catch (err) {
       console.error('Analysis failed:', err);
-      setError(err.message);
+      
+      // Enhanced error categorization
+      let errorMessage = err.message;
+      let errorType = 'GENERAL_ERROR';
+      
+      if (err.message.includes('CORS error')) {
+        errorType = 'CORS_ERROR';
+      } else if (err.message.includes('N8N_WEBHOOK_NOT_ACTIVE') || err.message.includes('webhook') && err.message.includes('not registered')) {
+        errorType = 'WEBHOOK_NOT_ACTIVE';
+      } else if (err.message.includes('N8N_ERROR')) {
+        errorType = 'N8N_SERVICE_ERROR';
+      } else if (err.message.includes('Invalid N8N response') || err.message.includes('Missing required analysis')) {
+        errorType = 'INVALID_RESPONSE';
+      } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        errorType = 'NETWORK_ERROR';
+        errorMessage = `Network error: Unable to connect to ${useProxy ? 'proxy server' : 'N8N webhook'}. Please check your internet connection and try again.`;
+      }
+      
+      setError({ message: errorMessage, type: errorType });
       setStatus('error');
       setProgress(0);
     }
@@ -214,12 +265,18 @@ const AnalysisControl = ({
       case 'analyzing': return 'Analyzing gaps and matches...';
       case 'complete': return 'Analysis complete!';
       case 'error': {
-        if (error && error.includes('N8N_WEBHOOK_NOT_ACTIVE')) {
+        if (error?.type === 'WEBHOOK_NOT_ACTIVE') {
           return 'N8N Workflow Not Active: Please activate your analysis workflow in N8N and try again.';
-        } else if (error && error.includes('N8N_ERROR')) {
-          return `N8N Service Error: ${error.replace('N8N_ERROR: ', '')}`;
+        } else if (error?.type === 'N8N_SERVICE_ERROR') {
+          return `N8N Service Error: ${error.message.replace('N8N_ERROR: ', '')}`;
+        } else if (error?.type === 'CORS_ERROR') {
+          return 'CORS Error: Cross-origin request blocked. See details below for solutions.';
+        } else if (error?.type === 'INVALID_RESPONSE') {
+          return 'Invalid Response: N8N webhook did not return expected analysis data.';
+        } else if (error?.type === 'NETWORK_ERROR') {
+          return 'Network Error: Unable to connect to analysis service.';
         }
-        return `Error: ${error}`;
+        return `Error: ${error?.message || error}`;
       }
       default: return 'Ready to analyze';
     }
@@ -262,15 +319,13 @@ const AnalysisControl = ({
 
       {status === 'error' && (
         <div style={styles.errorContainer}>
-          {error && error.includes('N8N_WEBHOOK_NOT_ACTIVE') && (
+          {error?.type === 'WEBHOOK_NOT_ACTIVE' && (
             <div style={styles.webhookErrorInfo}>
               <p style={styles.errorTitle}>Workflow Not Active</p>
               <p style={styles.errorDescription}>
                 The N8N analysis workflow needs to be activated before you can run analysis.
               </p>
-              <p style={styles.errorInstructions}>
-                To fix this:
-              </p>
+              <p style={styles.errorInstructions}>To fix this:</p>
               <ol style={styles.errorSteps}>
                 <li>Open your N8N workflow editor</li>
                 <li>Find the "get_cvjd" workflow</li>
@@ -279,6 +334,37 @@ const AnalysisControl = ({
               </ol>
             </div>
           )}
+          
+          {error?.type === 'CORS_ERROR' && (
+            <div style={styles.corsErrorInfo}>
+              <p style={styles.errorTitle}>CORS (Cross-Origin) Error</p>
+              <p style={styles.errorDescription}>
+                {error.message}
+              </p>
+              <p style={styles.errorInstructions}>Possible solutions:</p>
+              <ol style={styles.errorSteps}>
+                <li>If you have a proxy server, set VITE_USE_PROXY_IN_PROD=true in your environment variables</li>
+                <li>Configure CORS headers on your N8N webhook to allow requests from {window.location.origin}</li>
+                <li>Use a different hosting platform that supports CORS proxying</li>
+              </ol>
+            </div>
+          )}
+          
+          {(error?.type === 'INVALID_RESPONSE' || error?.type === 'N8N_SERVICE_ERROR') && (
+            <div style={styles.serviceErrorInfo}>
+              <p style={styles.errorTitle}>
+                {error.type === 'INVALID_RESPONSE' ? 'Invalid Response' : 'Service Error'}
+              </p>
+              <p style={styles.errorDescription}>{error.message}</p>
+              <p style={styles.errorInstructions}>This suggests:</p>
+              <ul style={styles.errorSteps}>
+                <li>The N8N webhook may not be configured correctly</li>
+                <li>The workflow might be returning unexpected data format</li>
+                <li>Check N8N logs for detailed error information</li>
+              </ul>
+            </div>
+          )}
+          
           <button onClick={performAnalysis} style={styles.retryButton}>
             Retry Analysis
           </button>
@@ -346,6 +432,24 @@ const styles = {
   webhookErrorInfo: {
     backgroundColor: '#1a1a1a',
     border: '1px solid #ff6b6b',
+    borderRadius: '4px',
+    padding: '15px',
+    marginBottom: '15px',
+    fontSize: '14px',
+    lineHeight: '1.4'
+  },
+  corsErrorInfo: {
+    backgroundColor: '#1a1a1a',
+    border: '1px solid #ffa500',
+    borderRadius: '4px',
+    padding: '15px',
+    marginBottom: '15px',
+    fontSize: '14px',
+    lineHeight: '1.4'
+  },
+  serviceErrorInfo: {
+    backgroundColor: '#1a1a1a',
+    border: '1px solid #ff69b4',
     borderRadius: '4px',
     padding: '15px',
     marginBottom: '15px',
