@@ -3,7 +3,7 @@
  * Following TDD principles from GL-TESTING-GUIDELINES.md
  */
 
-import { setupTest } from '../../test/utils/testSetup';
+import { setupTest } from '@/test/utils/testSetup';
 
 // Mock @supabase/supabase-js
 const mockCreateClient = jest.fn();

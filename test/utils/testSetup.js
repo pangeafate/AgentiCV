@@ -62,7 +62,7 @@ export function setupTest(options = {}) {
   const {
     useFakeTimers = true,
     mockConsole = true,
-    autoCleanup = true,
+    autoCleanup = false,
     mockStorage = true,
     mockFetch = false
   } = options;
@@ -137,10 +137,8 @@ export function setupTest(options = {}) {
     }
   };
 
-  // Auto cleanup after each test if requested
-  if (autoCleanup) {
-    afterEach(cleanup);
-  }
+  // Return cleanup function instead of setting up hook automatically
+  // Tests should call cleanup manually or set up their own afterEach hook
 
   // Get wrapper for React components with providers
   const getWrapper = (providers = []) => {

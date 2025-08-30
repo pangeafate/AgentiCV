@@ -4,7 +4,7 @@
  */
 
 import { fetchWithCORS, isProduction } from './corsProxy';
-import { setupTest } from '../test/utils/testSetup';
+import { setupTest } from '@/test/utils/testSetup';
 
 // Mock console methods
 const consoleSpy = {

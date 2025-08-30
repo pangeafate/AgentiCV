@@ -11,8 +11,8 @@ import {
   downloadCV,
   STORAGE_CONFIG
 } from './cv.service';
-import { SupabaseMockFactory } from '../../test/mocks/supabase';
-import { setupTest } from '../../test/utils/testSetup';
+import { SupabaseMockFactory } from '@/test/mocks/supabase';
+import { setupTest } from '@/test/utils/testSetup';
 
 // Mock the entire config module to control isSupabaseConfigured
 jest.mock('./config', () => ({

@@ -16,7 +16,7 @@ import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import toast from 'react-hot-toast';
-import { setupTest, createMockFile, TestDataFactory } from '../../../../test';
+import { setupTest, createMockFile, TestDataFactory } from '@/test';
 import CVUploader from './CVUploader';
 
 // Mock the cv.service module

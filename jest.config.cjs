@@ -6,8 +6,7 @@ module.exports = {
     '^@/test$': '<rootDir>/test/index.js',
     '^@/test/(.*)$': '<rootDir>/test/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    'import\\.meta\\.env': '<rootDir>/test/mocks/importMetaEnv.js'
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
@@ -36,7 +35,13 @@ module.exports = {
   moduleFileExtensions: ['js', 'jsx', 'json'],
   globals: {
     'import.meta': {
-      env: {}
+      env: {
+        VITE_SUPABASE_URL: 'https://test.supabase.co',
+        VITE_SUPABASE_ANON_KEY: 'test-key',
+        VITE_N8N_COMPLETE_ANALYSIS_URL: 'https://n8n.test.com/webhook/analyze',
+        PROD: false,
+        DEV: true
+      }
     }
   }
 };

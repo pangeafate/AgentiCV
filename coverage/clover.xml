@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1756564597779" clover="3.2.0">
-  <project timestamp="1756564597780" name="All files">
-    <metrics statements="447" coveredstatements="144" conditionals="356" coveredconditionals="139" methods="75" coveredmethods="37" elements="878" coveredelements="320" complexity="0" loc="447" ncloc="447" packages="8" files="16" classes="16"/>
+<coverage generated="1756567273595" clover="3.2.0">
+  <project timestamp="1756567273595" name="All files">
+    <metrics statements="447" coveredstatements="207" conditionals="356" coveredconditionals="169" methods="75" coveredmethods="47" elements="878" coveredelements="423" complexity="0" loc="447" ncloc="447" packages="8" files="16" classes="16"/>
     <package name="src">
       <metrics statements="52" coveredstatements="35" conditionals="31" coveredconditionals="23" methods="17" coveredmethods="13"/>
       <file name="App.jsx" path="/Users/sergeypodolskiy/CODEBASE/25 08 29 AgentiCV/agenticv-frontend/src/App.jsx">
@@ -370,7 +370,7 @@
       </file>
     </package>
     <package name="src.services.supabase">
-      <metrics statements="103" coveredstatements="7" conditionals="48" coveredconditionals="0" methods="11" coveredmethods="0"/>
+      <metrics statements="103" coveredstatements="59" conditionals="48" coveredconditionals="22" methods="11" coveredmethods="8"/>
       <file name="config.js" path="/Users/sergeypodolskiy/CODEBASE/25 08 29 AgentiCV/agenticv-frontend/src/services/supabase/config.js">
         <metrics statements="26" coveredstatements="0" conditionals="17" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="4" count="0" type="cond" truecount="0" falsecount="2"/>
@@ -401,88 +401,88 @@
         <line num="73" count="0" type="stmt"/>
       </file>
       <file name="cv.service.js" path="/Users/sergeypodolskiy/CODEBASE/25 08 29 AgentiCV/agenticv-frontend/src/services/supabase/cv.service.js">
-        <metrics statements="77" coveredstatements="7" conditionals="31" coveredconditionals="0" methods="8" coveredmethods="0"/>
-        <line num="8" count="1" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="22" count="1" type="stmt"/>
-        <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
+        <metrics statements="77" coveredstatements="59" conditionals="31" coveredconditionals="22" methods="8" coveredmethods="8"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="7" type="stmt"/>
+        <line num="10" count="7" type="stmt"/>
+        <line num="11" count="7" type="stmt"/>
+        <line num="12" count="7" type="stmt"/>
+        <line num="14" count="7" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="24" count="7" type="cond" truecount="1" falsecount="1"/>
         <line num="25" count="0" type="stmt"/>
-        <line num="32" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="32" count="7" type="cond" truecount="1" falsecount="1"/>
         <line num="33" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="37" count="7" type="stmt"/>
+        <line num="38" count="7" type="cond" truecount="1" falsecount="1"/>
         <line num="39" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="50" count="1" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="53" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
+        <line num="42" count="7" type="stmt"/>
+        <line num="50" count="2" type="stmt"/>
+        <line num="51" count="9" type="stmt"/>
+        <line num="53" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="2" type="stmt"/>
+        <line num="57" count="2" type="stmt"/>
         <line num="59" count="0" type="stmt"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
-        <line num="79" count="0" type="stmt"/>
-        <line num="82" count="0" type="stmt"/>
-        <line num="90" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="73" count="7" type="stmt"/>
+        <line num="76" count="7" type="stmt"/>
+        <line num="77" count="7" type="stmt"/>
+        <line num="79" count="7" type="stmt"/>
+        <line num="82" count="7" type="stmt"/>
+        <line num="90" count="7" type="cond" truecount="1" falsecount="1"/>
         <line num="91" count="0" type="stmt"/>
         <line num="92" count="0" type="stmt"/>
-        <line num="96" count="0" type="stmt"/>
-        <line num="101" count="0" type="stmt"/>
-        <line num="117" count="0" type="stmt"/>
+        <line num="96" count="7" type="stmt"/>
+        <line num="101" count="7" type="stmt"/>
+        <line num="117" count="7" type="stmt"/>
         <line num="120" count="0" type="stmt"/>
         <line num="121" count="0" type="stmt"/>
-        <line num="130" count="1" type="stmt"/>
-        <line num="131" count="0" type="stmt"/>
-        <line num="132" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="133" count="0" type="stmt"/>
-        <line num="134" count="0" type="stmt"/>
-        <line num="140" count="0" type="stmt"/>
-        <line num="144" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="130" count="2" type="stmt"/>
+        <line num="131" count="7" type="stmt"/>
+        <line num="132" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="133" count="1" type="stmt"/>
+        <line num="134" count="1" type="stmt"/>
+        <line num="140" count="6" type="stmt"/>
+        <line num="144" count="6" type="cond" truecount="1" falsecount="1"/>
         <line num="145" count="0" type="stmt"/>
-        <line num="148" count="0" type="stmt"/>
+        <line num="148" count="6" type="stmt"/>
         <line num="155" count="0" type="stmt"/>
         <line num="156" count="0" type="stmt"/>
-        <line num="165" count="1" type="cond" truecount="0" falsecount="1"/>
-        <line num="166" count="0" type="stmt"/>
-        <line num="167" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="168" count="0" type="stmt"/>
-        <line num="169" count="0" type="stmt"/>
-        <line num="172" count="0" type="stmt"/>
-        <line num="180" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="165" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="166" count="7" type="stmt"/>
+        <line num="167" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="168" count="1" type="stmt"/>
+        <line num="169" count="1" type="stmt"/>
+        <line num="172" count="6" type="stmt"/>
+        <line num="180" count="6" type="cond" truecount="1" falsecount="1"/>
         <line num="181" count="0" type="stmt"/>
-        <line num="184" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="184" count="6" type="cond" truecount="1" falsecount="1"/>
         <line num="187" count="0" type="stmt"/>
         <line num="188" count="0" type="stmt"/>
-        <line num="197" count="1" type="stmt"/>
-        <line num="198" count="0" type="stmt"/>
-        <line num="199" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="200" count="0" type="stmt"/>
-        <line num="201" count="0" type="stmt"/>
-        <line num="209" count="0" type="stmt"/>
-        <line num="215" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="197" count="2" type="stmt"/>
+        <line num="198" count="4" type="stmt"/>
+        <line num="199" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="200" count="1" type="stmt"/>
+        <line num="201" count="1" type="stmt"/>
+        <line num="209" count="3" type="stmt"/>
+        <line num="215" count="3" type="cond" truecount="1" falsecount="1"/>
         <line num="216" count="0" type="stmt"/>
-        <line num="219" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="219" count="3" type="cond" truecount="2" falsecount="0"/>
         <line num="222" count="0" type="stmt"/>
         <line num="223" count="0" type="stmt"/>
-        <line num="232" count="1" type="stmt"/>
-        <line num="233" count="0" type="stmt"/>
-        <line num="234" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="235" count="0" type="stmt"/>
-        <line num="238" count="0" type="stmt"/>
-        <line num="242" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="232" count="2" type="stmt"/>
+        <line num="233" count="4" type="stmt"/>
+        <line num="234" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="235" count="1" type="stmt"/>
+        <line num="238" count="3" type="stmt"/>
+        <line num="242" count="3" type="cond" truecount="1" falsecount="1"/>
         <line num="243" count="0" type="stmt"/>
-        <line num="246" count="0" type="stmt"/>
-        <line num="249" count="0" type="stmt"/>
-        <line num="250" count="0" type="stmt"/>
+        <line num="246" count="3" type="stmt"/>
+        <line num="249" count="1" type="stmt"/>
+        <line num="250" count="1" type="stmt"/>
       </file>
     </package>
     <package name="src.utils">
-      <metrics statements="31" coveredstatements="0" conditionals="17" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <metrics statements="31" coveredstatements="11" conditionals="17" coveredconditionals="8" methods="4" coveredmethods="2"/>
       <file name="corsProxy.js" path="/Users/sergeypodolskiy/CODEBASE/25 08 29 AgentiCV/agenticv-frontend/src/utils/corsProxy.js">
         <metrics statements="20" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="4" count="0" type="cond" truecount="0" falsecount="1"/>
@@ -507,18 +507,18 @@
         <line num="55" count="0" type="cond" truecount="0" falsecount="2"/>
       </file>
       <file name="pdfExtractor.js" path="/Users/sergeypodolskiy/CODEBASE/25 08 29 AgentiCV/agenticv-frontend/src/utils/pdfExtractor.js">
-        <metrics statements="11" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="19" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="29" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
+        <metrics statements="11" coveredstatements="11" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
+        <line num="10" count="14" type="stmt"/>
+        <line num="17" count="41" type="stmt"/>
+        <line num="19" count="39" type="cond" truecount="2" falsecount="0"/>
+        <line num="21" count="26" type="stmt"/>
+        <line num="24" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="26" count="4" type="stmt"/>
+        <line num="29" count="9" type="cond" truecount="4" falsecount="0"/>
+        <line num="32" count="5" type="stmt"/>
+        <line num="36" count="4" type="stmt"/>
+        <line num="37" count="4" type="stmt"/>
+        <line num="39" count="2" type="stmt"/>
       </file>
     </package>
   </project>

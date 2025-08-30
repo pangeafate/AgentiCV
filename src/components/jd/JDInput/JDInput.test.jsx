@@ -16,7 +16,7 @@
 import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { setupTest, createMockJobDescription } from '../../../../test';
+import { setupTest, createMockJobDescription } from '@/test';
 import JDInput from './JDInput';
 
 describe('JDInput Component', () => {

@@ -4,7 +4,7 @@
  */
 
 import { extractTextFromPDF, extractTextFromFile } from './pdfExtractor';
-import { setupTest } from '../test/utils/testSetup';
+import { setupTest } from '@/test/utils/testSetup';
 
 // Mock console methods
 const consoleSpy = {
